@@ -3,6 +3,7 @@ from matplotlib.figure import Figure
 from PyQt4 import QtGui, QtCore
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
+scheme='summer'
 
 class MyMplCanvas(FigureCanvas):
 
@@ -54,8 +55,7 @@ class histogram(MyMplCanvas):
 
     def compute_initial_figure(self, variables):
         x = self.model.data[:, variables]
-        self.axes.hist(x, 20, normed=1, facecolor='green')
-        # plt.grid(True)
+        self.axes.hist(x, 20, normed=1, color=matplotlib.pyplot.get_cmap(scheme)(0.5))
 
 
 class scatterplot(MyMplCanvas):
@@ -63,11 +63,11 @@ class scatterplot(MyMplCanvas):
     def compute_initial_figure(self, variables):
         t = self.model.data[:, variables[0]]
         s = self.model.data[:, variables[1]]
-        self.axes.scatter(t, s)
+        self.axes.scatter(t, s, c='black',marker='.',alpha=0.2)
         corr = self.model.corrmat[variables[0], variables[1]]
         self.axes.set_axis_bgcolor(correlationColor(corr))
 
 
 def correlationColor(corr):
-    summer =  matplotlib.pyplot.get_cmap('summer')
+    summer =  matplotlib.pyplot.get_cmap(scheme)
     return summer(abs(corr))
