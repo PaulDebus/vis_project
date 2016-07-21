@@ -19,10 +19,17 @@
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QSplitter::handle:horizontal {color : white}</string>
+     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <widget class="QSplitter" name="splitter">
+      <property name="styleSheet">
+       <string notr="true">QSplitter {background : white}
+</string>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
