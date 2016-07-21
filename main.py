@@ -1,6 +1,7 @@
 from PyQt4.uic import loadUiType
 from PyQt4.uic import loadUi
 from PyQt4.QtGui import *
+import plots
 
 
 Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
@@ -14,6 +15,8 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def addMatrix(self):
         loadUi('GUI/Matrix.ui', self.matrixWindow)
+        hist=plots.scatterplot(model,variables=[1,2],parent=None)
+        self.matrixWindow.gridLayout.addWidget(hist,1,1)
 
     def loadNames(self, model):
         qmodel = QStandardItemModel(self.variableList)
