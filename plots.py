@@ -69,5 +69,5 @@ class scatterplot(MyMplCanvas):
 
 
 def correlationColor(corr):
-    Blues =  matplotlib.pyplot.get_cmap('summer')
-    return Blues(abs(corr))
+    summer =  matplotlib.pyplot.get_cmap('summer')
+    return summer(abs(corr))

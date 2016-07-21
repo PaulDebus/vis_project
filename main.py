@@ -17,7 +17,7 @@ class Main(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
     def addMatrix(self, model):
-        loadUi('GUI/Matrix.ui', self.matrixWindow)
+        loadUi('GUI/mat.ui', self.matrixWindow)
         size = self.variableList.frameGeometry().width() / len(model.activeVariables)
         self.splitter.splitterMoved.connect(self.resizeLeft)
         num = len(model.activeVariables)
@@ -43,7 +43,7 @@ class Main(QMainWindow, Ui_MainWindow):
 
     def resizeLeft(self):
         size = self.variableList.frameGeometry().width()
-#        self.matrixWindow.widget.setGeometry(
+        self.matrixWindow.resize(size,size)
 
 if __name__ == '__main__':
     import sys
