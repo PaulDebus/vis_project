@@ -15,11 +15,11 @@ class Main(QMainWindow, Ui_MainWindow):
     def __init__(self, ):
         super(Main, self).__init__()
         self.setupUi(self)
+        self.splitter.splitterMoved.connect(self.resizeLeft)
 
     def addMatrix(self, model):
         loadUi('GUI/mat.ui', self.matrixWindow)
         size = self.variableList.frameGeometry().width() / len(model.activeVariables)
-        self.splitter.splitterMoved.connect(self.resizeLeft)
         num = len(model.activeVariables)
         for row in range(1,num+1):
             for col in range(row,num+1):
@@ -30,6 +30,9 @@ class Main(QMainWindow, Ui_MainWindow):
                     plot = plots.scatterplot(model, variables = [row+2,col+2],
                         parent=None, width = size, height= size)
                 self.matrixWindow.gridLayout.addWidget(plot,num+1-row,col)
+        size = self.splitter.size().width()
+        self.splitter.setSizes([200, size-200])
+        self.resizeLeft()
 
     def loadNames(self, model):
         qmodel = QStandardItemModel(self.variableList)
