@@ -20,5 +20,4 @@ def fromFile(filename):
     output = header.split(";")[1]
     output = output.split(",")
     data = numpy.genfromtxt(filename, delimiter=",", skip_header=1)
-    print(data)
     return Model(input, output, data)
