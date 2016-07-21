@@ -10,6 +10,7 @@ class Model(object):
         self.data = data
         self.stats = [Stats(col) for col in data.T]
         self.corrmat = numpy.corrcoef(data.T)
+        self.activeVariables = self.inputNames + [outputNames[1]]
 
 
 def fromFile(filename):
