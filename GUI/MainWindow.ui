@@ -35,7 +35,7 @@
          <widget class="QWidget" name="matrixWindow" native="true"/>
         </item>
         <item>
-         <widget class="QListView" name="listView"/>
+         <widget class="QListView" name="variableList"/>
         </item>
        </layout>
       </widget>
