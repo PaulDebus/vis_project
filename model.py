@@ -22,6 +22,13 @@ class Model(object):
 		if name in self.activeVariables:
 			self.activeVariables.remove(name)
 
+	def getVariableIndex(self,name):
+		if name in self.inputNames:
+			return self.inputNames.index(name)
+		else:
+			if name in self.outputNames:
+				return len(self.inputNames) + self.outputNames.index(name)
+
 def fromFile(filename):
 	with open(filename) as f:
 		header = f.readline()[:-1]

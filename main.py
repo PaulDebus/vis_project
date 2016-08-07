@@ -16,15 +16,21 @@ class Main(QMainWindow, Ui_MainWindow):
 		loadUi('GUI/mat.ui', self.matrixWindow)
 
 	def addMatrix(self):
+		for i in reversed(range(plot.count())): 
+			plot.itemAt(i).widget().setParent(None)
 		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
 		for row in range(1,num+1):
+			rowVariable=model.activeVariables[row-1]
+			print(rowVariable)
 			for col in range(row,num+1):
+				colVariable=model.activeVariables[col-1]
 				if row == col:
-					plot = plots.histogram(self.model, variables = row,
+					plot = plots.histogram(self.model, variables = self.model.getVariableIndex(rowVariable),
 						parent=None, width = size, height= size)
 				else:
-					plot = plots.scatterplot(self.model, variables = [row+2,col+2],
+					#plot = plots.scatterplot(self.model, variables = [row+2,col+2],
+					plot = plots.scatterplot(self.model, variables = [self.model.getVariableIndex(rowVariable),self.model.getVariableIndex(colVariable)],
 						parent=None, width = size, height= size)
 				self.matrixWindow.gridLayout.addWidget(plot,num+1-row,col)
 		size = self.splitter.size().width()
@@ -45,11 +51,11 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.variableList.setModel(qmodel)
 
 	def listChange(self,e):
-		print(e.text(),e.checkState())
-		if e.checkState==0:
+		if e.checkState()==0:
 			self.model.setPassiveVar(e.text())
 		else:
 			self.model.setActiveVar(e.text())
+		print(e.text(),e.checkState(),self.model.getVariableIndex(e.text()))
 		self.addMatrix()
 	
 	def resizeLeft(self):
