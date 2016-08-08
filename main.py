@@ -10,12 +10,12 @@ Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
 
 class Main(QMainWindow, Ui_MainWindow):
 
-    def __init__(self, model):
-        self.model = model
-        super(Main, self).__init__()
-        self.setupUi(self)
-        self.splitter.splitterMoved.connect(self.resizeLeft)
-        loadUi('GUI/mat.ui', self.matrixWindow)
+	def __init__(self, model):
+		self.model = model
+		super(Main, self).__init__()
+		self.setupUi(self)
+		self.splitter.splitterMoved.connect(self.resizeLeft)
+		loadUi('GUI/mat.ui', self.matrixWindow)
 
 	def addMatrix(self):
 		while self.matrixWindow.gridLayout.count():
@@ -60,57 +60,44 @@ class Main(QMainWindow, Ui_MainWindow):
 			qmodel.appendRow(item)
 		self.variableList.setModel(qmodel)
 
-    def loadNames(self):
-        qmodel = QtGui.QStandardItemModel(self.variableList)
-        qmodel.itemChanged.connect(self.listChange)
-        # QObject.connect(qmodel,SIGNAL('selectionChanged()',listChange))
-        variables = self.model.inputNames + self.model.outputNames
-        for var in variables:
-            item = QtGui.QStandardItem(var)
-            item.setCheckable(True)
-            if var in self.model.activeVariables:
-                item.setCheckState(2)
-            qmodel.appendRow(item)
-        self.variableList.setModel(qmodel)
+	def listChange(self, e):
+		print(e.text(), e.checkState())
+		if e.checkState() == 0:
+			self.model.setPassiveVar(e.text())
+		else:
+			self.model.setActiveVar(e.text())
+		self.addMatrix()
 
-    def listChange(self, e):
-        print(e.text(), e.checkState())
-        if e.checkState() == 0:
-            self.model.setPassiveVar(e.text())
-        else:
-            self.model.setActiveVar(e.text())
-        self.addMatrix()
+	def resizeLeft(self):
+		size = self.variableList.frameGeometry().width()
+		self.matrixWindow.resize(size, size)
 
-    def resizeLeft(self):
-        size = self.variableList.frameGeometry().width()
-        self.matrixWindow.resize(size, size)
-
-    def showDataBoxes(self):
-        var1, var2 = self.model.getSelectedVariables()
-        self.label.setText("{0}, {1}".format(var1, var2))
-        index1 = self.model.getVariableIndex(var1)
-        index2 = self.model.getVariableIndex(var2)
-        mdi = self.mdiArea
-        subs = []
-        subs.append(subwindow.histMDI(self.model, index1, index2))
-        subs.append(subwindow.scattMDI(self.model, index1, index2))
-        subs.append(subwindow.histMDI(self.model, index2, index1))
-        for sub in subs:
-            mdi.addSubWindow(sub)
-            sub.show()
-        mdi.tileSubWindows()
+	def showDataBoxes(self):
+		var1, var2 = self.model.getSelectedVariables()
+		self.label.setText("{0}, {1}".format(var1, var2))
+		index1 = self.model.getVariableIndex(var1)
+		index2 = self.model.getVariableIndex(var2)
+		mdi = self.mdiArea
+		subs = []
+		subs.append(subwindow.histMDI(self.model, index1, index2))
+		subs.append(subwindow.scattMDI(self.model, index1, index2))
+		subs.append(subwindow.histMDI(self.model, index2, index1))
+		for sub in subs:
+			mdi.addSubWindow(sub)
+			sub.show()
+		mdi.tileSubWindows()
 
 
 if __name__ == '__main__':
-    import sys
-    from PyQt4 import QtGui
-    import model
+	import sys
+	from PyQt4 import QtGui
+	import model
 
-    model = model.fromFile('output.txt')
-    app = QtGui.QApplication(sys.argv)
-    main = Main(model)
-    main.addMatrix()
-    main.loadNames()
-    main.showDataBoxes()
-    main.show()
-    sys.exit(app.exec_())
+	model = model.fromFile('output.txt')
+	app = QtGui.QApplication(sys.argv)
+	main = Main(model)
+	main.addMatrix()
+	main.loadNames()
+	main.showDataBoxes()
+	main.show()
+	sys.exit(app.exec_())

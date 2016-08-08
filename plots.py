@@ -14,16 +14,18 @@ def histogram(model, variables, parent=None, width=4, height=4):
 	d =  model.data[:, variables]
 
 	y,x = np.histogram(d, bins=10)
-	color = tuple([255*i for i in list(matplotlib.pyplot.get_cmap(scheme)(0.5))])
+	color = correlationColor(0.5)
 	pw.plot(x, y, stepMode=True, fillLevel=0 ,pen='k', brush=color)
 	pw.hideAxis('left')
 	pw.hideAxis('bottom')
+	pw.hideButtons()
+	pw.setMouseEnabled(False,False)
 	return pw
 
 
 def scatterplot(model, variables, parent=None, width=4, height=4):
 	corr = model.corrmat[variables[0], variables[1]]
-	color = tuple([255*i for i in list(correlationColor(corr))])
+	color = correlationColor(corr)
 	pg.setConfigOption('background',color)
 	pg.setConfigOption('foreground', 'k')
 	pw = pg.PlotWidget(viewBox=vb.MyViewBox())
@@ -37,11 +39,14 @@ def scatterplot(model, variables, parent=None, width=4, height=4):
 	s2.addPoints(spots)
 	pw.hideAxis('left')
 	pw.hideAxis('bottom')
+	pw.hideButtons()
 	pw.addItem(s2)
-	pw.getViewBox().setMouseMode(pg.ViewBox.RectMode)
+	pw.setMouseEnabled(False,False)
+	#TODO löschen?
+	#pw.getViewBox().setMouseMode(pg.ViewBox.RectMode)
 	return pw
 
 
 def correlationColor(corr):
 	summer = matplotlib.pyplot.get_cmap(scheme)
-	return summer(abs(corr))
+	return tuple([255*i for i in list(summer(abs(corr)))])
