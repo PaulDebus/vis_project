@@ -14,6 +14,7 @@ def histogram(model, variables, parent=None, width=4, height=4):
 	pw = pg.PlotWidget()
 	d =  model.data[:, variables]
 
+
 	y,x = np.histogram(d, bins=10)
 	color = correlationColor(0.5)
 	pw.plot(x, y, stepMode=True, fillLevel=0 ,pen='k', brush=color)
@@ -62,4 +63,5 @@ def scatterplot(model, variables, parent=None, width=4, height=4):
 def correlationColor(corr):
 	summer = matplotlib.pyplot.get_cmap(scheme)
 	return tuple([255*i for i in list(summer(abs(corr)))])
+
 

@@ -10,7 +10,6 @@ Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
 
 class Main(QMainWindow, Ui_MainWindow):
 
-
 	def __init__(self, model):
 		self.model = model
 		super(Main, self).__init__()
@@ -97,4 +96,3 @@ if __name__ == '__main__':
 	main.showDataBoxes()
 	main.show()
 	sys.exit(app.exec_())
-
