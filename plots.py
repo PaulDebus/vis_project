@@ -23,7 +23,7 @@ def histogram(model, variables, parent=None, width=4, height=4):
 
 def scatterplot(model, variables, parent=None, width=4, height=4):
 	corr = model.corrmat[variables[0], variables[1]]
-	color = tuple([255*i for i in list(matplotlib.pyplot.get_cmap(scheme)(corr))])
+	color = tuple([255*i for i in list(correlationColor(corr))])
 	pg.setConfigOption('background',color)
 	pg.setConfigOption('foreground', 'k')
 	pw = pg.PlotWidget(viewBox=vb.MyViewBox())
@@ -44,5 +44,4 @@ def scatterplot(model, variables, parent=None, width=4, height=4):
 
 def correlationColor(corr):
 	summer = matplotlib.pyplot.get_cmap(scheme)
-	print (summer(abs(corr)))
 	return summer(abs(corr))

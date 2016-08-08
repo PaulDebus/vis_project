@@ -1,6 +1,6 @@
 from PyQt4.uic import loadUiType
 from PyQt4.uic import loadUi
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 import plots
 
 
@@ -27,7 +27,6 @@ class Main(QMainWindow, Ui_MainWindow):
 		size = self.variableList.frameGeometry(
 			).width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
-		print(model.activeVariables)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])
@@ -38,24 +37,15 @@ class Main(QMainWindow, Ui_MainWindow):
 					plot = plots.scatterplot(self.model, variables=[var1, var2],
 											parent=None, width=size, height=size)
 				self.matrixWindow.gridLayout.addWidget(plot,num+1-row,col)
-		size = self.splitter.size().width()
-		self.splitter.setSizes([200, size-200])
-		self.resizeLeft()
-		
-		while self.matrixWindow.horizontalLayout_2.count():
-			item = self.matrixWindow.horizontalLayout_2.takeAt(0)
-			widget = item.widget()
-			widget.deleteLater()
-			item = self.matrixWindow.verticalLayout_3.takeAt(0)
-			widget = item.widget()
-			widget.deleteLater()
-
+			label = QtGui.QLabel(model.activeVariables[row-1])
+			self.matrixWindow.gridLayout.addWidget(label,num+1-row,num+1)
 		for name in model.activeVariables:
-			label1 = QtGui.QLabel(name)
-			label2 = QtGui.QLabel(name)
-			self.matrixWindow.horizontalLayout_2.addWidget(label1)
-			self.matrixWindow.verticalLayout_3.addWidget(label2)
+			label = QtGui.QLabel(name)
+			self.matrixWindow.gridLayout.addWidget(label,num+1,model.activeVariables.index(name)+1)
+		size = self.splitter.size().width()
+		self.resizeLeft()
 
+		
 	def loadNames(self):
 		qmodel = QtGui.QStandardItemModel(self.variableList)
 		qmodel.itemChanged.connect(self.listChange)
