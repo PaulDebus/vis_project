@@ -69,10 +69,11 @@ class Main(QMainWindow, Ui_MainWindow):
 	def showDataBoxes(self):
 		mdi = self.mdiArea
 		mdi.closeAllSubWindows()
-		var1, var2 = self.model.getSelectedVariables()
+		index1, index2 = self.model.getSelectedVariables()
+		var1 = self.model.getIndexVariable(index1)
+		var2 = self.model.getIndexVariable(index2)
 		self.label.setText("{0}, {1}".format(var1, var2))
-		index1 = self.model.getVariableIndex(var1)
-		index2 = self.model.getVariableIndex(var2)
+
 		subs = []
 		subs.append(subwindow.histMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))

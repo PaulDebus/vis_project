@@ -30,8 +30,9 @@ class myScatter(pg.PlotWidget):
 		self.parent = parent
 		self.model = model
 		self.variables = variables
+		#self.variables[0] = len(model.activeVariables)+1 - self.variables[0]
 	def mousePressEvent(self,e):
-			self.model.setSelectedVariables(*self.variables)
+			self.model.setSelectedVariables(self.variables[1], self.variables[0])
 			self.parent.showDataBoxes()
 	def mouseMoveEvent(self,e):
 		pass
