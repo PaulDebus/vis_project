@@ -1,6 +1,6 @@
 from PyQt4.uic import loadUiType
 from PyQt4.uic import loadUi
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 import plots
 import subwindow
 
@@ -17,55 +17,48 @@ class Main(QMainWindow, Ui_MainWindow):
         self.splitter.splitterMoved.connect(self.resizeLeft)
         loadUi('GUI/mat.ui', self.matrixWindow)
 
-    def addMatrix(self):
-        while self.matrixWindow.gridLayout.count():
-            item = self.matrixWindow.gridLayout.takeAt(0)
-            widget = item.widget()
-            # if widget has some id attributes you need to
-            # save in a list to maintain order, you can do that here
-            # i.e.:   aList.append(widget.someId)
-            widget.deleteLater()
-        size = self.variableList.frameGeometry(
-            ).width() / len(self.model.activeVariables)
-        num = len(model.activeVariables)
-        for row in range(1, num+1):
-            for col in range(row, num+1):
-                var1 = model.getVariableIndex(model.activeVariables[row-1])
-                var2 = model.getVariableIndex(model.activeVariables[col-1])
-                if row == col:
-                    plot = plots.histogram(
-                        self.model,
-                        variables=var1,
-                        parent=None,
-                        width=size,
-                        height=size)
-                else:
-                    plot = plots.scatterplot(
-                        self.model,
-                        variables=[
-                            var1,
-                            var2],
-                        parent=None,
-                        width=size,
-                        height=size)
-                self.matrixWindow.gridLayout.addWidget(plot, num+1-row, col)
-        size = self.splitter.size().width()
-        self.splitter.setSizes([200, size-200])
-        self.resizeLeft()
+	def addMatrix(self):
+		while self.matrixWindow.gridLayout.count():
+			item = self.matrixWindow.gridLayout.takeAt(0)
+			widget = item.widget()
+			# if widget has some id attributes you need to
+			# save in a list to maintain order, you can do that here
+			# i.e.:   aList.append(widget.someId)
+			widget.deleteLater()
+		size = self.variableList.frameGeometry(
+			).width() / len(self.model.activeVariables)
+		num = len(model.activeVariables)
+		for row in range(1, num+1):
+			for col in range(row, num+1):
+				var1 = model.getVariableIndex(model.activeVariables[row-1])
+				var2 = model.getVariableIndex(model.activeVariables[col-1])
+				if row == col:
+					plot = plots.histogram(self.model, variables=var1, parent=None, width=size, height=size)
+				else:
+					plot = plots.scatterplot(self.model, variables=[var1, var2],
+											parent=None, width=size, height=size)
+				self.matrixWindow.gridLayout.addWidget(plot,num+1-row,col)
+			label = QtGui.QLabel(model.activeVariables[row-1])
+			self.matrixWindow.gridLayout.addWidget(label,num+1-row,num+1)
+		for name in model.activeVariables:
+			label = QtGui.QLabel(name)
+			self.matrixWindow.gridLayout.addWidget(label,num+1,model.activeVariables.index(name)+1)
+		size = self.splitter.size().width()
+		self.resizeLeft()
 
-        while self.matrixWindow.horizontalLayout_2.count():
-            item = self.matrixWindow.horizontalLayout_2.takeAt(0)
-            widget = item.widget()
-            widget.deleteLater()
-            item = self.matrixWindow.verticalLayout_3.takeAt(0)
-            widget = item.widget()
-            widget.deleteLater()
 
-        for name in model.activeVariables:
-            label1 = QtGui.QLabel(name)
-            label2 = QtGui.QLabel(name)
-            self.matrixWindow.horizontalLayout_2.addWidget(label1)
-            self.matrixWindow.verticalLayout_3.addWidget(label2)
+	def loadNames(self):
+		qmodel = QtGui.QStandardItemModel(self.variableList)
+		qmodel.itemChanged.connect(self.listChange)
+		# QObject.connect(qmodel,SIGNAL('selectionChanged()',listChange))
+		variables = self.model.inputNames + self.model.outputNames
+		for var in variables:
+			item = QtGui.QStandardItem(var)
+			item.setCheckable(True)
+			if var in self.model.activeVariables:
+				item.setCheckState(2)
+			qmodel.appendRow(item)
+		self.variableList.setModel(qmodel)
 
     def loadNames(self):
         qmodel = QtGui.QStandardItemModel(self.variableList)
