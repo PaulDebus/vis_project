@@ -29,9 +29,19 @@ class Model(object):
         else:
             if name in self.outputNames:
                 return len(self.inputNames) + self.outputNames.index(name)
+    def getIndexVariable(self, index):
+        if index < len(self.inputNames) -1:
+            return self.inputNames[index]
+        else :
+            return self.outputNames[index - len(self.inputNames)]
 
     def getSelectedVariables(self):
         return tuple(self.selectedVariables)
+    def setSelectedVariables(self,var1, var2):
+        title1 = self.getIndexVariable(var1)
+        title2 = self.getIndexVariable(var2)
+        self.selectedVariables = [title1, title2]
+
 def fromFile(filename):
     with open(filename) as f:
         header = f.readline()[:-1]
