@@ -7,6 +7,7 @@ scheme = 'summer'
 
 
 def histogram(model, variables, parent=None, width=4, height=4):
+
 	pg.setConfigOption('background', 0.98)
 	pg.setConfigOption('foreground', 'k')
 
@@ -22,14 +23,26 @@ def histogram(model, variables, parent=None, width=4, height=4):
 	pw.setMouseEnabled(False,False)
 	return pw
 
+class myScatter(pg.PlotWidget):
+	def __init__(self, parent, model, variables):
+		super(myScatter, self).__init__()
+		self.parent = parent
+		self.model = model
+		self.variables = variables
+	def mousePressEvent(self,e):
+			self.model.setSelectedVariables(*self.variables)
+			self.parent.showDataBoxes()
+	def mouseMoveEvent(self,e):
+		pass
+	def mouseReleaseEvent(self,e):
+		pass
 
 def scatterplot(model, variables, parent=None, width=4, height=4):
 	corr = model.corrmat[variables[0], variables[1]]
 	color = correlationColor(corr)
 	pg.setConfigOption('background',color)
 	pg.setConfigOption('foreground', 'k')
-	pw = pg.PlotWidget(viewBox=vb.MyViewBox())
-
+	pw = myScatter(parent, model, variables)
 	t = model.data[:, variables[0]]
 	s = model.data[:, variables[1]]
 
@@ -42,11 +55,11 @@ def scatterplot(model, variables, parent=None, width=4, height=4):
 	pw.hideButtons()
 	pw.addItem(s2)
 	pw.setMouseEnabled(False,False)
-	#TODO löschen?
-	#pw.getViewBox().setMouseMode(pg.ViewBox.RectMode)
+
 	return pw
 
 
 def correlationColor(corr):
 	summer = matplotlib.pyplot.get_cmap(scheme)
 	return tuple([255*i for i in list(summer(abs(corr)))])
+

@@ -13,10 +13,13 @@ max=[]
 min=[]
 mean=[]
 
-x=model.data[:,1]
-x=model.data[:,5]
-x=np.around(x,-3)
-for i in range(0,len(x)-1):
+#x=model.data[:,1]
+#x=model.data[:,5]
+x=np.around(x,1)
+
+for i in x:
+
+'''for i in range(0,len(x)-1):
 	if x[i] in x1:
 		index=x1.index(x[i])
 		mean[index]+=y[i]
@@ -37,5 +40,6 @@ for unique in x1:
 	mean[index]=mean[index]/counts[index]
 print(x1,min,mean) 
 plt.plot(x1, min, 'b',mean,'k',max,'r')
-#plt.scatter(x, y,alpha=0.5)
+'''
+plt.scatter(x, y,alpha=0.5)
 plt.show()

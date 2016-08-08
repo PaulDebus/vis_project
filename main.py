@@ -10,6 +10,7 @@ Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
 
 class Main(QMainWindow, Ui_MainWindow):
 
+
 	def __init__(self, model):
 		self.model = model
 		super(Main, self).__init__()
@@ -17,16 +18,13 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.splitter.splitterMoved.connect(self.resizeLeft)
 		loadUi('GUI/mat.ui', self.matrixWindow)
 
+
 	def addMatrix(self):
 		while self.matrixWindow.gridLayout.count():
-			item = self.matrixWindow.gridLayout.takeAt(0)
-			widget = item.widget()
-			# if widget has some id attributes you need to
-			# save in a list to maintain order, you can do that here
-			# i.e.:   aList.append(widget.someId)
-			widget.deleteLater()
-		size = self.variableList.frameGeometry(
-			).width() / len(self.model.activeVariables)
+				item = self.matrixWindow.gridLayout.takeAt(0)
+				widget = item.widget()
+				widget.deleteLater()
+		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
@@ -35,8 +33,7 @@ class Main(QMainWindow, Ui_MainWindow):
 				if row == col:
 					plot = plots.histogram(self.model, variables=var1, parent=None, width=size, height=size)
 				else:
-					plot = plots.scatterplot(self.model, variables=[var1, var2],
-											parent=None, width=size, height=size)
+					plot = plots.scatterplot(self.model, variables=[var1, var2],parent=self, width=size, height=size)
 				self.matrixWindow.gridLayout.addWidget(plot,num+1-row,col)
 			label = QtGui.QLabel(model.activeVariables[row-1])
 			self.matrixWindow.gridLayout.addWidget(label,num+1-row,num+1)
@@ -46,11 +43,9 @@ class Main(QMainWindow, Ui_MainWindow):
 		size = self.splitter.size().width()
 		self.resizeLeft()
 
-
 	def loadNames(self):
 		qmodel = QtGui.QStandardItemModel(self.variableList)
 		qmodel.itemChanged.connect(self.listChange)
-		# QObject.connect(qmodel,SIGNAL('selectionChanged()',listChange))
 		variables = self.model.inputNames + self.model.outputNames
 		for var in variables:
 			item = QtGui.QStandardItem(var)
@@ -59,7 +54,6 @@ class Main(QMainWindow, Ui_MainWindow):
 				item.setCheckState(2)
 			qmodel.appendRow(item)
 		self.variableList.setModel(qmodel)
-
 	def listChange(self, e):
 		print(e.text(), e.checkState())
 		if e.checkState() == 0:
@@ -72,12 +66,14 @@ class Main(QMainWindow, Ui_MainWindow):
 		size = self.variableList.frameGeometry().width()
 		self.matrixWindow.resize(size, size)
 
+
 	def showDataBoxes(self):
+		mdi = self.mdiArea
+		mdi.closeAllSubWindows()
 		var1, var2 = self.model.getSelectedVariables()
 		self.label.setText("{0}, {1}".format(var1, var2))
 		index1 = self.model.getVariableIndex(var1)
 		index2 = self.model.getVariableIndex(var2)
-		mdi = self.mdiArea
 		subs = []
 		subs.append(subwindow.histMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
@@ -101,3 +97,4 @@ if __name__ == '__main__':
 	main.showDataBoxes()
 	main.show()
 	sys.exit(app.exec_())
+
