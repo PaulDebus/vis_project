@@ -81,6 +81,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		subs = []
 		subs.append(subwindow.histMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
+		subs.append(subwindow.scattMDI(self.model, index1, index2))
 		subs.append(subwindow.histMDI(self.model, index2, index1))
 		subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		for sub in subs:
