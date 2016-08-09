@@ -31,6 +31,9 @@
   <property name="styleSheet">
    <string notr="true">QMainWindow {background: rgb(255, 255, 255)}</string>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="maximumSize">
     <size>
@@ -70,6 +73,9 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="opaqueResize">
+       <bool>false</bool>
       </property>
       <widget class="QWidget" name="verticalLayoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
@@ -151,6 +157,24 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="background">
+           <brush brushstyle="SolidPattern">
+            <color alpha="245">
+             <red>247</red>
+             <green>247</green>
+             <blue>247</blue>
+            </color>
+           </brush>
+          </property>
+          <property name="viewMode">
+           <enum>QMdiArea::SubWindowView</enum>
+          </property>
+          <property name="tabShape">
+           <enum>QTabWidget::Triangular</enum>
           </property>
          </widget>
         </item>

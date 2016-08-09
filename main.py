@@ -39,6 +39,9 @@ class Main(QMainWindow, Ui_MainWindow):
 		for name in model.activeVariables:
 			label = QtGui.QLabel(name)
 			self.matrixWindow.gridLayout.addWidget(label,num+1,model.activeVariables.index(name)+1)
+		colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
+		self.matrixWindow.gridLayout.addWidget(colorBar,1,1,3,2)
+		
 		size = self.splitter.size().width()
 		self.resizeLeft()
 
@@ -78,6 +81,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		subs.append(subwindow.histMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
 		subs.append(subwindow.histMDI(self.model, index2, index1))
+		subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)
 			sub.show()

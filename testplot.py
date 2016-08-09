@@ -1,45 +1,26 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import model
+import pyqtgraph as pg
+import colorBar
+import matplotlib.pyplot
 
-model = model.fromFile('output.txt')
+if __name__ == '__main__':
+    app = pg.mkQApp()
 
-N=2000
-x = np.random.rand(N)
-y = np.random.rand(N)
+    summer = matplotlib.pyplot.get_cmap('summer')
+    # use less ink
+    pg.setConfigOption('background', 'w')
+    pg.setConfigOption('foreground', 'k')
 
-x1=[]
-max=[]
-min=[]
-mean=[]
+    pw = pg.plot()
+    
+    # make colormap
+    stops = np.r_[-1.0, -0.5, 0.5, 1.0]
+    colors = np.array([summer(i) for i in stops])
+    cm = pg.ColorMap(stops, colors)
+    
+    # make colorbar, placing by hand
+    cb = colorBar.ColorBar(cm, 10, 200, label='Foo (Hz)')#, [0., 0.5, 1.0])
+    pw.scene().addItem(cb)
+    cb.translate(570.0, 90.0)
 
-#x=model.data[:,1]
-#x=model.data[:,5]
-x=np.around(x,1)
-
-for i in x:
-
-'''for i in range(0,len(x)-1):
-	if x[i] in x1:
-		index=x1.index(x[i])
-		mean[index]+=y[i]
-		if max[index]<y[i]:
-			max[index]=y[i]
-		if min[index]>y[i]:
-			min[index]=y[i]
-	else:
-		x1.append(x[i])
-		max.append(y[i])
-		min.append(y[i])
-		mean.append(y[i])
-
-unique, counts = np.unique(x, return_counts=True)
-
-for unique in x1:
-	index=x1.index(unique)
-	mean[index]=mean[index]/counts[index]
-print(x1,min,mean) 
-plt.plot(x1, min, 'b',mean,'k',max,'r')
-'''
-plt.scatter(x, y,alpha=0.5)
-plt.show()
+    app.exec_()

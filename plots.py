@@ -3,8 +3,30 @@ import matplotlib.pyplot
 import numpy as np
 import pyqtgraph as pg
 import viewbox as vb
+import colorBar as cb
 scheme = 'summer'
 
+def colorBar(model, parent=None, width=4, height=4):
+	pw = pg.PlotWidget()
+	summer = matplotlib.pyplot.get_cmap(scheme)
+	# make colormap
+	stops = np.r_[0, 0.5, 1.0]
+	colors = np.array([summer(i) for i in stops])
+	cm = pg.ColorMap(stops, colors)
+	cob = cb.ColorBar(cm, width, height, label='Correlation')
+	#cob.setRotation(180)
+	#cob.setScale(0.5)
+	pw.addItem(cob)
+	pw.hideAxis('left')
+	pw.hideAxis('bottom')
+	pw.hideButtons()
+	#pw.setMouseEnabled(False,False)
+	'''pw=pg.GradientWidget()
+	cm=pg.GradientEditorItem()
+	stops = np.r_[0, 0.5, 1.0]
+	colors = np.array([correlationColor(i) for i in stops])
+	cm = pg.ColorMap(stops, colors)'''
+	return pw
 
 def histogram(model, variables, parent=None, width=4, height=4):
 
