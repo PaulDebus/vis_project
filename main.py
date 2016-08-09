@@ -77,6 +77,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		subs = []
 		subs.append(subwindow.histMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
+		subs.append(subwindow.scattMDI(self.model, index1, index2))
 		subs.append(subwindow.histMDI(self.model, index2, index1))
 		for sub in subs:
 			mdi.addSubWindow(sub)

@@ -15,6 +15,7 @@ class Model(object):
 			self.activeVariables=self.activeVariables[:7]
 		self.selectedVariables = [self.getVariableIndex(i) for i in self.activeVariables[:2]]
 		self.selection = []
+		self.subscribers = []
 
 	def setActiveVar(self,name):
 		if not name in self.activeVariables:
@@ -40,13 +41,20 @@ class Model(object):
 		return tuple(self.selectedVariables)
 	def setSelectedVariables(self,var1, var2):
 		self.selectedVariables = [var1, var2]
-		print(self.selectedVariables)
 
 	def setSelection(self, indices):
 		self.selection = indices
+		for sub in self.subscribers:
+			sub.refresh()
 
 	def resetSelection(self):
 		self.selection = []
+		for sub in self.subscribers:
+			sub.refresh()
+
+
+	def subscribeSelection(self, subscriber):
+		self.subscribers.append(subscriber)
 
 def fromFile(filename):
 	with open(filename) as f:
