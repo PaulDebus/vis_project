@@ -14,6 +14,7 @@ class Model(object):
 		if len(self.activeVariables)>7:
 			self.activeVariables=self.activeVariables[:7]
 		self.selectedVariables = [self.getVariableIndex(i) for i in self.activeVariables[:2]]
+		self.selection = []
 
 	def setActiveVar(self,name):
 		if not name in self.activeVariables:
@@ -40,6 +41,12 @@ class Model(object):
 	def setSelectedVariables(self,var1, var2):
 		self.selectedVariables = [var1, var2]
 		print(self.selectedVariables)
+
+	def setSelection(self, indices):
+		self.selection = indices
+
+	def resetSelection(self):
+		self.selection = []
 
 def fromFile(filename):
 	with open(filename) as f:
