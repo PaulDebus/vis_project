@@ -18,6 +18,8 @@ def histogram(model, variables, parent=None, width=4, height=4):
 		pw.plot(x, y, stepMode=True, fillLevel=0 ,pen='k', brush=color)
 		pw.hideAxis('left')
 		pw.hideAxis('bottom')
+    pw.hideButtons()
+    pw.setMouseEnabled(False, False)
 		return pw
 
 
@@ -47,6 +49,8 @@ def scatterplot(model, variables, parent=None, width=4, height=4):
 		s2 = pg.ScatterPlotItem(size=10, pen=pg.mkPen('k'), pxMode=True)
 
 
+pw.hideButtons()
+pw.setMouseEnabled(False, False)
 		spots = [{'pos': [t[i],s[i]], 'data': 1, 'symbol': 'o', 'size': 1} for i in range(len(t))]
 		s2.addPoints(spots)
 		pw.hideAxis('left')

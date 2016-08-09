@@ -34,8 +34,8 @@
   <widget class="QWidget" name="centralwidget">
    <property name="maximumSize">
     <size>
-     <width>1000</width>
-     <height>2000</height>
+     <width>16777215</width>
+     <height>16777215</height>
     </size>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
