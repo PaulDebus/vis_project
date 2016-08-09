@@ -13,7 +13,7 @@ class Model(object):
 		self.activeVariables = self.inputNames + self.outputNames
 		if len(self.activeVariables)>7:
 			self.activeVariables=self.activeVariables[:7]
-		self.selectedVariables = self.activeVariables[:2]
+		self.selectedVariables = [self.getVariableIndex(i) for i in self.activeVariables[:2]]
 
 	def setActiveVar(self,name):
 		if not name in self.activeVariables:
@@ -30,7 +30,7 @@ class Model(object):
 			if name in self.outputNames:
 				return len(self.inputNames) + self.outputNames.index(name)
 	def getIndexVariable(self, index):
-		if index < len(self.inputNames) -1:
+		if index < len(self.inputNames) :
 			return self.inputNames[index]
 		else :
 			return self.outputNames[index - len(self.inputNames)]
@@ -38,9 +38,8 @@ class Model(object):
 	def getSelectedVariables(self):
 		return tuple(self.selectedVariables)
 	def setSelectedVariables(self,var1, var2):
-		title1 = self.getIndexVariable(var1)
-		title2 = self.getIndexVariable(var2)
-		self.selectedVariables = [title1, title2]
+		self.selectedVariables = [var1, var2]
+		print(self.selectedVariables)
 
 def fromFile(filename):
 	with open(filename) as f:
