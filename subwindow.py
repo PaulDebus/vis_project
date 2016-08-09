@@ -1,6 +1,6 @@
 import pyqtgraph as pg
 import matplotlib.pyplot
-from pyqtgraph.Qt import QtGui
+from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 
 scheme='summer'
@@ -28,14 +28,17 @@ class histMDI(myMDI):
 class scattMDI(myMDI):
 
 	def setup(self):
-		#corr = self.model.corrmat[self.var1, self.var2]
-		#color = tuple([255*i for i in list(matplotlib.pyplot.get_cmap(scheme)(corr))])
-		#pg.setConfigOption('background',color)
-		#pg.setConfigOption('foreground', 'k')
-		pw = pg.PlotWidget()
-
+		pw = subScatter(self.model, [self.var1, self.var2])
+		#pw = pg.PlotWidget()
+                
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
+
+		self.roi = pg.RectROI([np.mean(t)*0.95, np.mean(s)*0.95], [(max(t)-min(t))*0.1,(max(s)-min(s))*0.1], pen=pg.mkPen('r'))
+		pw.addItem(self.roi)
+		self.roi.setZValue(10)
+		pw.roi = self.roi
+		self.roi.hide()
 
 		s2 = pg.ScatterPlotItem(size=10, pen=pg.mkPen('k'), pxMode=True)
 
@@ -49,3 +52,35 @@ class scattMDI(myMDI):
 def correlationColor(corr):
 	summer = matplotlib.pyplot.get_cmap(scheme)
 	return tuple([255*i for i in list(summer(abs(corr)))])
+
+class subScatter(pg.PlotWidget):
+	def __init__(self, model, variables):
+		super(subScatter, self).__init__()
+		self.model = model
+		self.variables = variables
+		self.selector = False
+		self.roi = None
+	def mousePressEvent(self,e):
+		if e.button() == QtCore.Qt.RightButton:
+			self.roi.hide()
+			self.selector = not self.selector
+			self.vb = self.getPlotItem().getViewBox()
+			self.pos = self.vb.mapSceneToView(e.pos())
+		else:
+			super(subScatter, self).mousePressEvent(e)
+	def mouseMoveEvent(self,e):
+		if self.selector:
+			if self.roi:
+				epos = self.vb.mapSceneToView(e.pos())
+				pos = [min(self.pos.x() , epos.x()) , min(self.pos.y(), epos.y())]
+				self.roi.setPos(pos)
+				size = [max(self.pos.x(), epos.x())-pos[0] , max(self.pos.y(), epos.y())-pos[1]]
+				self.roi.setSize(size)
+				self.roi.show()
+		else:
+			super(subScatter, self).mouseMoveEvent(e)
+	def mouseReleaseEvent(self,e):
+		if self.selector:
+			self.selector = not self.selector
+		else:
+			super(subScatter, self).mouseReleaseEvent(e)
