@@ -7,19 +7,25 @@ import colorBar as cb
 scheme = 'summer'
 
 def colorBar(model, parent=None, width=4, height=4):
+	#creates colorBar
+	pg.setConfigOption('background', 0.98)
+	pg.setConfigOption('foreground', 'k')
 	pw = pg.PlotWidget()
-	summer = matplotlib.pyplot.get_cmap(scheme)
 	# make colormap
+	summer = matplotlib.pyplot.get_cmap(scheme)
 	stops = np.r_[0, 0.5, 1.0]
 	colors = np.array([summer(i) for i in stops])
 	cm = pg.ColorMap(stops, colors)
 	cob = cb.ColorBar(cm, width, height, label='Correlation')
-	#cob.setRotation(180)
-	#cob.setScale(0.5)
+	cob.setScale(-0.5)
 	pw.addItem(cob)
 	pw.hideAxis('left')
 	pw.hideAxis('bottom')
 	pw.hideButtons()
+	pw.invertX()
+	pw.getViewBox().scaleBy(1.5)
+	pw.setTitle('<font size="3"> Correlation </font>')
+	#pw.setDownsampling(ds=0.5,auto=False)
 	#pw.setMouseEnabled(False,False)
 	'''pw=pg.GradientWidget()
 	cm=pg.GradientEditorItem()
@@ -29,14 +35,11 @@ def colorBar(model, parent=None, width=4, height=4):
 	return pw
 
 def histogram(model, variables, parent=None, width=4, height=4):
-
+	#creates histogramm
 	pg.setConfigOption('background', 0.98)
 	pg.setConfigOption('foreground', 'k')
-
 	pw = pg.PlotWidget()
 	d =  model.data[:, variables]
-
-
 	y,x = np.histogram(d, bins=10)
 	color = correlationColor(0.5)
 	pw.plot(x, y, stepMode=True, fillLevel=0 ,pen='k', brush=color)
@@ -54,14 +57,15 @@ class myScatter(pg.PlotWidget):
 		self.variables = variables
 		#self.variables[0] = len(model.activeVariables)+1 - self.variables[0]
 	def mousePressEvent(self,e):
-			self.model.setSelectedVariables(self.variables[1], self.variables[0])
-			self.parent.showDataBoxes()
+		self.model.setSelectedVariables(self.variables[1], self.variables[0])
+		self.parent.showDataBoxes()
 	def mouseMoveEvent(self,e):
 		pass
 	def mouseReleaseEvent(self,e):
 		pass
 
 def scatterplot(model, variables, parent=None, width=4, height=4):
+	#creates scatterplot
 	corr = model.corrmat[variables[0], variables[1]]
 	color = correlationColor(corr)
 	pg.setConfigOption('background',color)

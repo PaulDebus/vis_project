@@ -72,6 +72,14 @@ class MeanStdMDI(myMDI):
 		self.setWidget(pw)
 		self.setWindowTitle("Mean- and StandardDeviationPlot: "+str(self.model.getIndexVariable(self.var1))+ " / " +str(self.model.getIndexVariable(self.var2)))
 
+class TextMDI(myMDI):
+
+	def setup(self):
+		#TODO textwidget
+		pw = pd.plotWidget
+		t = self.model.data[:, self.var1]
+		s = self.model.data[:, self.var2]
+		self.setWidget(pw)
 
 class scattMDI(myMDI):
 

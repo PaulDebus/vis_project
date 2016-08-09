@@ -25,6 +25,9 @@ class Main(QMainWindow, Ui_MainWindow):
 				widget.deleteLater()
 		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
+		if num > 3:
+			colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
+			self.matrixWindow.gridLayout.addWidget(colorBar,1,1,2,2)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])
@@ -39,8 +42,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		for name in model.activeVariables:
 			label = QtGui.QLabel(name)
 			self.matrixWindow.gridLayout.addWidget(label,num+1,model.activeVariables.index(name)+1)
-		colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
-		self.matrixWindow.gridLayout.addWidget(colorBar,1,1,3,2)
+
 		
 		size = self.splitter.size().width()
 		self.resizeLeft()

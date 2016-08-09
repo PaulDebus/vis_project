@@ -49,25 +49,20 @@ class Model(object):
 		self.selectedVariables = [var1, var2]
 
 	def setSelection(self, indices):
+		#sets list of selected datarows for brushing and linking
 		self.selection = indices
 		for sub in self.subscribers:
 			sub.refresh()
 
 	def resetSelection(self):
+		#resets list of selected datarows
 		self.selection = []
 		for sub in self.subscribers:
 			sub.refresh()
 
-
 	def subscribeSelection(self, subscriber):
+		#ad to list of all selection subscribers
 		self.subscribers.append(subscriber)
-
-	def getVariableIndex(self,name):
-		if name in self.inputNames:
-			return self.inputNames.index(name)
-		else:
-			if name in self.outputNames:
-				return len(self.inputNames) + self.outputNames.index(name)
 
 def fromFile(filename):
 	with open(filename) as f:
