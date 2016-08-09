@@ -13,7 +13,7 @@ def colorBar(model, parent=None, width=4, height=4):
 	stops = np.r_[0, 0.5, 1.0]
 	colors = np.array([summer(i) for i in stops])
 	cm = pg.ColorMap(stops, colors)
-	cob = cb.ColorBar(cm, width, height, label='Correlation')
+	cob = cb.ColorBar(cm, width/2, height/2, label='Correlation')
 	#cob.setRotation(180)
 	#cob.setScale(0.5)
 	pw.addItem(cob)
