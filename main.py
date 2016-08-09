@@ -85,7 +85,9 @@ class Main(QMainWindow, Ui_MainWindow):
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
 		subs.append(subwindow.histMDI(self.model, index2, index1))
-		subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
+		if abs(self.model.corrmat[index1, index2])>0.25:
+			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
+		subs.append(subwindow.TextMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)
 			sub.show()

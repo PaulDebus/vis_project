@@ -36,7 +36,7 @@ class Model(object):
 				return len(self.inputNames) + self.outputNames.index(name)
 
 	def getIndexVariable(self, index):
-		#returns variablename ofr given final index
+		#returns variablename of given final index
 		if index < len(self.inputNames) :
 			return self.inputNames[index]
 		else :

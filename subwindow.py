@@ -76,9 +76,20 @@ class TextMDI(myMDI):
 
 	def setup(self):
 		#TODO textwidget
-		pw = pd.plotWidget
+		pw = QtGui.QWidget()
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
+		labels=[]
+		labels.append(QtGui.QLabel("Statistical Data from: " + self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2)) )
+		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
+		labels.append(QtGui.QLabel("Correlation Coefficient: {0:.5f}".format(self.model.corrmat[self.var1,self.var2]) ))
+		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
+		vbox = QtGui.QVBoxLayout()
+		[label.setFont(QtGui.QFont('SansSerif', 10)) for label in labels]
+		labels[0].setFont(QtGui.QFont('SansSerif', 15))
+		for i in labels:
+			vbox.addWidget(i)
+		pw.setLayout(vbox)
 		self.setWidget(pw)
 
 class scattMDI(myMDI):
@@ -135,7 +146,7 @@ class subScatter(pg.PlotWidget):
 		self.x = []
 		self.y = []
 		self.parent = parent
-		self.roi.sigRegionChanged.connect(self.select)
+		self.roi.sigRegionChangeFinished.connect(self.select)
 	def mousePressEvent(self,e):
 		if e.button() == QtCore.Qt.RightButton:
 			self.roi.hide()
@@ -147,14 +158,12 @@ class subScatter(pg.PlotWidget):
 			super(subScatter, self).mousePressEvent(e)
 	def mouseMoveEvent(self,e):
 		if self.selector:
-			if self.roi:
-				epos = self.vb.mapSceneToView(e.pos())
-				pos = [min(self.pos.x() , epos.x()) , min(self.pos.y(), epos.y())]
-				self.roi.setPos(pos)
-				size = [max(self.pos.x(), epos.x())-pos[0] , max(self.pos.y(), epos.y())-pos[1]]
-				self.roi.setSize(size)
-				self.roi.show()
-				self.select()
+			epos = self.vb.mapSceneToView(e.pos())
+			pos = [min(self.pos.x() , epos.x()) , min(self.pos.y(), epos.y())]
+			self.roi.setPos(pos)
+			size = [max(self.pos.x(), epos.x())-pos[0] , max(self.pos.y(), epos.y())-pos[1]]
+			self.roi.setSize(size)
+			self.roi.show()
 		else:
 			super(subScatter, self).mouseMoveEvent(e)
 
@@ -183,5 +192,6 @@ class subScatter(pg.PlotWidget):
 	def mouseReleaseEvent(self,e):
 		if self.selector:
 			self.selector = not self.selector
+			self.select()
 		else:
 			super(subScatter, self).mouseReleaseEvent(e)
