@@ -84,15 +84,14 @@ class TextMDI(myMDI):
 class scattMDI(myMDI):
 
 	def setup(self):
-		pw = subScatter(self, self.model, [self.var1, self.var2])
+		self.roi = pg.RectROI([0,0],[1,1],pen=pg.mkPen('r'))
+		pw = subScatter(self, self.model, [self.var1, self.var2], self.roi)
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		self.model.subscribeSelection(self)
 
-		self.roi = pg.RectROI([0,0],[1,1],pen=pg.mkPen('r'))
 		pw.addItem(self.roi)
 		self.roi.setZValue(10)
-		pw.roi = self.roi
 		pw.x = t
 		pw.y = s
 		self.roi.hide()
@@ -127,15 +126,16 @@ def correlationColor(corr):
 	return tuple([255*i for i in list(summer(abs(corr)))])
 
 class subScatter(pg.PlotWidget):
-	def __init__(self, parent, model, variables):
+	def __init__(self, parent, model, variables, roi):
 		super(subScatter, self).__init__()
 		self.model = model
 		self.variables = variables
 		self.selector = False
-		self.roi = None
+		self.roi = roi
 		self.x = []
 		self.y = []
 		self.parent = parent
+		self.roi.sigRegionChanged.connect(self.select)
 	def mousePressEvent(self,e):
 		if e.button() == QtCore.Qt.RightButton:
 			self.roi.hide()
@@ -154,13 +154,32 @@ class subScatter(pg.PlotWidget):
 				size = [max(self.pos.x(), epos.x())-pos[0] , max(self.pos.y(), epos.y())-pos[1]]
 				self.roi.setSize(size)
 				self.roi.show()
+				self.select()
+		else:
+			super(subScatter, self).mouseMoveEvent(e)
+
+	def select(self):
 				# get ROI shape in coordinate system of the scatter plot
 				roiShape = self.roi.mapToItem(self.getPlotItem(), self.roi.shape())
 				# Get list of all points inside shape
-				selected = [i for i in range(len(self.x)) if roiShape.contains(self.vb.mapViewToScene(QtCore.QPoint(self.x[i], self.y[i])))]
+				def contains(x,y):
+						rect = roiShape.controlPointRect()
+						bl = rect.bottomLeft()
+						tr = rect.topRight()
+						bl = self.vb.mapSceneToView(bl)
+						tr = self.vb.mapSceneToView(tr)
+						bottom = bl.y()
+						left = bl.x()
+						right = tr.x()
+						top = tr.y()
+						if x > left:
+							if x < right:
+								if y > bottom:
+									if y < top:
+										return True
+						return False
+				selected = [i for i in range(len(self.x)) if contains(self.x[i], self.y[i])]
 				self.model.setSelection(selected)
-		else:
-			super(subScatter, self).mouseMoveEvent(e)
 	def mouseReleaseEvent(self,e):
 		if self.selector:
 			self.selector = not self.selector
