@@ -16,6 +16,29 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 		self.splitter.splitterMoved.connect(self.resizeLeft)
 		loadUi('GUI/mat.ui', self.matrixWindow)
+		bar = self.menuBar()
+		
+		menu = bar.addMenu("New")
+		menu.addAction("Scatter Plot")
+		menu.addAction("Histogram 1")
+		menu.addAction("Histogram 2")
+		menu.addAction("Mean + Std")
+		menu.triggered[QtGui.QAction].connect(self.windowaction)
+
+	def windowaction(self,q):
+		index1, index2 = self.model.getSelectedVariables()
+		if q.text() == "Scatter Plot":
+			sub = subwindow.scattMDI(self.model, index1, index2)
+		if q.text() == "Histogram 1":
+			sub = subwindow.histMDI(self.model, index1, index2)
+		if q.text() == "Histogram 2":
+			sub = subwindow.histMDI(self.model, index2, index2)
+		if q.text() == "Mean + Std":
+			sub = subwindow.MeanStdMDI(model, index1, index2)
+		self.mdiArea.addSubWindow(sub)
+		sub.show()
+		self.mdiArea.tileSubWindows()
+
 
 
 	def addMatrix(self):
@@ -72,7 +95,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.matrixWindow.resize(size, size)
 
 
-	def showDataBoxes(self):
+	def showDataBoxes(self, new=True):
 		mdi = self.mdiArea
 		mdi.closeAllSubWindows()
 		index1, index2 = self.model.getSelectedVariables()
@@ -80,13 +103,14 @@ class Main(QMainWindow, Ui_MainWindow):
 		var2 = self.model.getIndexVariable(index2)
 		self.label.setText("{0}, {1}".format(var1, var2))
 
-		subs = []
-		subs.append(subwindow.histMDI(self.model, index1, index2))
-		subs.append(subwindow.scattMDI(self.model, index1, index2))
-		subs.append(subwindow.scattMDI(self.model, index1, index2))
-		subs.append(subwindow.histMDI(self.model, index2, index1))
-		subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
-		for sub in subs:
+		if new:
+			self.subs = []
+			self.subs.append(subwindow.histMDI(self.model, index1, index2))
+			self.subs.append(subwindow.scattMDI(self.model, index1, index2))
+			self.subs.append(subwindow.scattMDI(self.model, index1, index2))
+			self.subs.append(subwindow.histMDI(self.model, index2, index1))
+			self.subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
+		for sub in self.subs:
 			mdi.addSubWindow(sub)
 			sub.show()
 		mdi.tileSubWindows()
