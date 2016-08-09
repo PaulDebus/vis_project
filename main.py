@@ -16,6 +16,29 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 		self.splitter.splitterMoved.connect(self.resizeLeft)
 		loadUi('GUI/mat.ui', self.matrixWindow)
+		bar = self.menuBar()
+		
+		menu = bar.addMenu("New")
+		menu.addAction("Scatter Plot")
+		menu.addAction("Histogram 1")
+		menu.addAction("Histogram 2")
+		menu.addAction("Mean + Std")
+		menu.triggered[QtGui.QAction].connect(self.windowaction)
+
+	def windowaction(self,q):
+		index1, index2 = self.model.getSelectedVariables()
+		if q.text() == "Scatter Plot":
+			sub = subwindow.scattMDI(self.model, index1, index2)
+		if q.text() == "Histogram 1":
+			sub = subwindow.histMDI(self.model, index1, index2)
+		if q.text() == "Histogram 2":
+			sub = subwindow.histMDI(self.model, index2, index2)
+		if q.text() == "Mean + Std":
+			sub = subwindow.MeanStdMDI(model, index1, index2)
+		self.mdiArea.addSubWindow(sub)
+		sub.show()
+		self.mdiArea.tileSubWindows()
+
 
 
 	def addMatrix(self):
@@ -72,7 +95,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.matrixWindow.resize(size, size)
 
 
-	def showDataBoxes(self):
+	def showDataBoxes(self, new=True):
 		mdi = self.mdiArea
 		mdi.closeAllSubWindows()
 		index1, index2 = self.model.getSelectedVariables()

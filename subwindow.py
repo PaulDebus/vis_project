@@ -150,6 +150,7 @@ class subScatter(pg.PlotWidget):
 	def mousePressEvent(self,e):
 		if e.button() == QtCore.Qt.RightButton:
 			self.roi.hide()
+			self.roi.sigRegionChangeFinished.disconnect()
 			self.model.resetSelection()
 			self.selector = not self.selector
 			self.vb = self.getPlotItem().getViewBox()
@@ -193,5 +194,9 @@ class subScatter(pg.PlotWidget):
 		if self.selector:
 			self.selector = not self.selector
 			self.select()
+<<<<<<< HEAD
+=======
+			self.roi.sigRegionChangeFinished.connect(self.select)
+>>>>>>> origin/master
 		else:
 			super(subScatter, self).mouseReleaseEvent(e)
