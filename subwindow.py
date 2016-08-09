@@ -80,7 +80,7 @@ class TextMDI(myMDI):
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		labels=[]
-		labels.append(QtGui.QLabel("Statistical Data from: " + self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2)) )
+		labels.append(QtGui.QLabel("Statistical Data from: \n" + self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2)) )
 		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
 		labels.append(QtGui.QLabel("Correlation Coefficient: {0:.5f}".format(self.model.corrmat[self.var1,self.var2]) ))
 		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
@@ -194,9 +194,6 @@ class subScatter(pg.PlotWidget):
 		if self.selector:
 			self.selector = not self.selector
 			self.select()
-<<<<<<< HEAD
-=======
 			self.roi.sigRegionChangeFinished.connect(self.select)
->>>>>>> origin/master
 		else:
 			super(subScatter, self).mouseReleaseEvent(e)
