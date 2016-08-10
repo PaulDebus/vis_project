@@ -1,8 +1,9 @@
 import pyqtgraph as pg
-import matplotlib.pyplot
 from pyqtgraph.Qt import QtGui, QtCore
 import numpy as np
 from scipy import stats as st
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
 
 scheme='summer'
 
@@ -25,20 +26,43 @@ class histMDI(myMDI):
 		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
 		self.setWidget(pw)
 		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
-'''
-class CoRMDI(myMDI):
+
+class Radar(object):
+	def __init__(self, fig, titles, labels, rect=None):
+		if rect is None:
+			rect = [0.1, 0.1, 0.8, 0.8]
+		self.n = len(titles)
+		self.angles = np.arange(0,360, 360.0/self.n)
+		self.axes = [fig.add_axes(rect, projection="polar", label="axes%d" % i) 
+						 for i in range(self.n)]
+		self.ax = self.axes[0]
+		self.ax.set_thetagrids(self.angles, labels=titles, fontsize=14)
+		for ax in self.axes[1:]:
+			ax.patch.set_visible(False)
+			ax.grid("off")
+			ax.xaxis.set_visible(False)
+		for ax, angle, label in zip(self.axes, self.angles, labels):
+			ax.set_rgrids(range(1, self.n+1), angle=angle, labels=label)
+			ax.spines["polar"].set_visible(False)
+			ax.set_ylim(0, 5)
+
+	def plot(self, values, *args, **kw):
+		angle = np.deg2rad(np.r_[self.angles, self.angles[0]])
+		values = np.r_[values, values[0]]
+		self.ax.plot(angle, values, *args, **kw)
+
+class RadarMDI(myMDI):
 	def setup(self):
-		pg.setConfigOption('foreground', 'k')
-		pw = pg.PlotWidget()
-		d = self.model.data[:, self.var1]
-		sts=[]
-		for i in range(self.model.inputNames):
-			sts.append(1-)
-		color = correlationColor(0.5)
-		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
-		self.setWidget(pw)
-		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
-'''
+		fig = plt.figure(figsize=(6, 6))
+		titles=self.model.inputNames+self.model.outputNames
+		labels = [["0.2","0.4","0.6","0.8","1"]]*len(self.model.inputNames+self.model.outputNames)
+		radar = Radar(fig, titles, labels)
+		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],  "-", lw=2, color="b", alpha=0.4, label=self.model.getVariableIndex(self.var1))
+		self.canvas = FigureCanvas(fig)
+		#wd=QtGui.QWidget()
+		self.setWidget(self.canvas)
+		self.setWindowTitle("Correlation Radar Plot " +str(self.model.getIndexVariable(self.var1)))
+
 
 class MeanStdMDI(myMDI):
 	def setup(self):
@@ -129,6 +153,7 @@ class TextMDI(myMDI):
 			vbox.addWidget(i)
 		pw.setLayout(vbox)
 		self.setWidget(pw)
+		self.setWindowTitle("Statistical Data")
 
 class scattMDI(myMDI):
 
@@ -220,7 +245,7 @@ class scattMDI(myMDI):
 
 
 def correlationColor(corr):
-	summer = matplotlib.pyplot.get_cmap(scheme)
+	summer = plt.get_cmap(scheme)
 	return tuple([255*i for i in list(summer(abs(corr)))])
 
 class subScatter(pg.PlotWidget):

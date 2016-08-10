@@ -4,6 +4,7 @@ from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import plots
 import subwindow
+import numpy as np
 
 
 Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
@@ -24,6 +25,9 @@ class Main(QMainWindow, Ui_MainWindow):
 		menu.addAction("Histogram 1")
 		menu.addAction("Histogram 2")
 		menu.addAction("Mean + Std")
+		menu.addAction("Statistics")
+		menu.addAction("Radar 1")
+		menu.addAction("Radar 2")
 		menu.triggered[QtGui.QAction].connect(self.windowaction)
 
 	def windowaction(self,q):
@@ -36,6 +40,12 @@ class Main(QMainWindow, Ui_MainWindow):
 			sub = subwindow.histMDI(self.model, index2, index2)
 		if q.text() == "Mean + Std":
 			sub = subwindow.MeanStdMDI(model, index1, index2)
+		if q.text() == "Statistics":
+			sub = subwindow.TextMDI(model, index1, index2)
+		if q.text() == "Radar 1":
+			sub = subwindow.RadarMDI(model, index1, index2)
+		if q.text() == "Radar 2":
+			sub = subwindow.RadarMDI(model, index2, index1)
 		self.mdiArea.addSubWindow(sub)
 		sub.show()
 		self.mdiArea.tileSubWindows()
@@ -111,6 +121,8 @@ class Main(QMainWindow, Ui_MainWindow):
 		if abs(self.model.corrmat[index1, index2])>0.25:
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		subs.append(subwindow.TextMDI(self.model, index1, index2))
+		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
+			subs.append(subwindow.RadarMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)
 			sub.show()
