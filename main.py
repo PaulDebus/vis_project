@@ -49,8 +49,8 @@ class Main(QMainWindow, Ui_MainWindow):
 		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
 		if num > 3:
-			colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
-			self.matrixWindow.gridLayout.addWidget(colorBar,1,1,2,2)
+			self.colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
+			self.matrixWindow.gridLayout.addWidget(self.colorBar,1,1,2,2)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])

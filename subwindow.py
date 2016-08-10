@@ -26,6 +26,20 @@ class histMDI(myMDI):
 		self.setWidget(pw)
 		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
 
+class CoRMDI(myMDI):
+	def setup(self):
+		pg.setConfigOption('foreground', 'k')
+		pw = pg.PlotWidget()
+		d = self.model.data[:, self.var1]
+		sts=[]
+		for i in range(self.model.inputNames):
+			sts.append(1-)
+		color = correlationColor(0.5)
+		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
+		self.setWidget(pw)
+		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
+
+
 class MeanStdMDI(myMDI):
 	def setup(self):
 		pw = pg.PlotWidget()
@@ -75,18 +89,42 @@ class MeanStdMDI(myMDI):
 class TextMDI(myMDI):
 
 	def setup(self):
-		#TODO textwidget
 		pw = QtGui.QWidget()
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
+		#stats from both variables
+		table1=("<table>"+
+			"<th align=\"left\">"+self.model.getIndexVariable(self.var1) + " and " + self.model.getIndexVariable(self.var2)+"</th>"+
+			"<tr><td>Number of Datapoints:</td><td>{}".format(len(t))+"</td></tr>"+
+			"<tr><td>Correlation Coefficient:</td><td>{0:.5f}".format(self.model.corrmat[self.var1,self.var2])+"</td></tr>"+
+			"</table>")
+		#stats from variable 1
+		table2=("<table>"+
+			"<th align=\"left\">"+self.model.getIndexVariable(self.var1)+"</th>"+
+			"<tr><td>Min: <\td><td>{0:.5f}".format(self.model.stats[self.var1].min)+"</td></tr>"+
+			"<tr><td>Max: <\td><td>{0:.5f}".format(self.model.stats[self.var1].max)+"</td></tr>"+
+			"<tr><td>Mean: <\td><td>{0:.5f}".format(self.model.stats[self.var1].mean)+"</td></tr>"+
+			"<tr><td>Median: <\td><td>{0:.5f}".format(self.model.stats[self.var1].median)+"</td></tr>"+
+			"<tr><td>Standard Deviation: <\td><td>{0:.5f}".format(self.model.stats[self.var1].std)+"</td></tr>"+
+			"<tr><td>Variance: <\td><td>{0:.5f}".format(self.model.stats[self.var1].var)+"</td></tr>"+
+			"</table>")
+		#stats from variable 2
+		table3=("<table>"+
+			"<th align=\"left\">"+self.model.getIndexVariable(self.var2)+"</th>"+
+			"<tr><td>Min: <\td><td>{0:.5f}".format(self.model.stats[self.var2].min)+"</td></tr>"+
+			"<tr><td>Max: <\td><td>{0:.5f}".format(self.model.stats[self.var2].max)+"</td></tr>"+
+			"<tr><td>Mean: <\td><td>{0:.5f}".format(self.model.stats[self.var2].mean)+"</td></tr>"+
+			"<tr><td>Median: <\td><td>{0:.5f}".format(self.model.stats[self.var2].median)+"</td></tr>"+
+			"<tr><td>Standard Deviation: <\td><td>{0:.5f}".format(self.model.stats[self.var2].std)+"</td></tr>"+
+			"<tr><td>Variance: <\td><td>{0:.5f}".format(self.model.stats[self.var2].var)+"</td></tr>"+
+			"</table>")
+		#print labels
 		labels=[]
-		labels.append(QtGui.QLabel("Statistical Data from: \n" + self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2)) )
-		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
-		labels.append(QtGui.QLabel("Correlation Coefficient: {0:.5f}".format(self.model.corrmat[self.var1,self.var2]) ))
-		labels.append(QtGui.QLabel("Number of Datapoints: {}".format(len(t)) ))
+		labels.append(QtGui.QLabel("<h2>Statistical Data from: </h2>"))
+		labels.append(QtGui.QLabel(table1))
+		labels.append(QtGui.QLabel(table2))
+		labels.append(QtGui.QLabel(table3))
 		vbox = QtGui.QVBoxLayout()
-		[label.setFont(QtGui.QFont('SansSerif', 10)) for label in labels]
-		labels[0].setFont(QtGui.QFont('SansSerif', 15))
 		for i in labels:
 			vbox.addWidget(i)
 		pw.setLayout(vbox)
