@@ -25,7 +25,7 @@ class histMDI(myMDI):
 		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
 		self.setWidget(pw)
 		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
-
+'''
 class CoRMDI(myMDI):
 	def setup(self):
 		pg.setConfigOption('foreground', 'k')
@@ -38,7 +38,7 @@ class CoRMDI(myMDI):
 		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
 		self.setWidget(pw)
 		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
-
+'''
 
 class MeanStdMDI(myMDI):
 	def setup(self):
@@ -135,11 +135,28 @@ class scattMDI(myMDI):
 	def setup(self):
 		self.roi = pg.RectROI([0,0],[1,1],pen=pg.mkPen('r'))
 		pw = subScatter(self, self.model, [self.var1, self.var2], self.roi)
+		self.center = QtGui.QWidget()
+		self.center.verticalLayout = QtGui.QVBoxLayout(self.center)
+
+
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		self.model.subscribeSelection(self)
+		def changed(old, new):
+			if (int(new) == 10 and int(old) == 8):
+				self.overlay.show()
+			if (int(new) == 8 and int(old) == 10):
+				self.overlay.hide()
+
+
+
+
+		self.windowStateChanged.connect(changed)
 
 		pw.addItem(self.roi)
+		pw.sigRangeChanged.connect(self.rangeChanged)
+
+
 		self.roi.setZValue(10)
 		pw.x = t
 		pw.y = s
@@ -148,13 +165,39 @@ class scattMDI(myMDI):
 		self.setWindowTitle("ScatterPlot: "+str(self.model.getIndexVariable(self.var1))+ " / " +str(self.model.getIndexVariable(self.var2)))
 
 		self.s2 = pg.ScatterPlotItem(size=10, pen=pg.mkPen('k'), pxMode=True)
+		self.s3 = pg.ScatterPlotItem(size=10, pen=pg.mkPen('k'), pxMode=True)
 		self.refresh()
 
+		self.overlay = pg.PlotWidget(pw)
+		self.overlay.addItem(self.s3)
+		vb = self.overlay.getPlotItem().getViewBox()
+		roisize = [max(t)-min(t), max(s)-min(s)]
+		self.overroi = pg.RectROI([min(t),min(s)],roisize, pen=pg.mkPen('r'), movable=False)
+		self.overlay.addItem(self.overroi)
+		for handle in self.overroi.getHandles():
+			self.overroi.removeHandle(handle)
+		self.overroi.show()
+		viewrange = vb.viewRange()
+		rangex = viewrange[0]
+		rangey = viewrange[1]
+		width = (rangex[1] - rangex[0])
+		height = (rangey[1] - rangey[0])
+		width = max(t)-min(t)
+		height = max(s)-min(s)
+		self.overlay.setFixedSize(200,150)
+		self.overlay.move(50 , 25)
+		self.overlay.hideButtons()
+		self.overlay.setMouseEnabled(False, False)
+		self.overlay.setBackground(0.89)
+		self.overlay.hide()
+
 		pw.addItem(self.s2)
-		self.setWidget(pw)
+		self.center.verticalLayout.addWidget(pw)
+		self.setWidget(self.center)
 
 	def refresh(self):
 		self.s2.clear()
+		self.s3.clear()
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		selection = self.model.selection
@@ -165,9 +208,15 @@ class scattMDI(myMDI):
 				size = 4
 			else:
 				pen = pg.mkPen('k')
-				size = 1
+				size = 2
 			spots.append({'pos': [t[i],s[i]], 'data': 1, 'symbol': 'o', 'size': size, 'pen': pen})
 		self.s2.addPoints(spots)
+		self.s3.addPoints(spots)
+	def rangeChanged(self, scatter, ranges):
+		rangex = ranges[0]
+		rangey = ranges[1]
+		self.overroi.setPos([rangex[0],rangey[0]])
+		self.overroi.setSize([rangex[1]-rangex[0], rangey[1]-rangey[0]])
 
 
 def correlationColor(corr):

@@ -1,6 +1,7 @@
 from PyQt4.uic import loadUiType
 from PyQt4.uic import loadUi
 from pyqtgraph.Qt import QtGui, QtCore
+import pyqtgraph as pg
 import plots
 import subwindow
 
@@ -49,8 +50,8 @@ class Main(QMainWindow, Ui_MainWindow):
 		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
 		if num > 3:
-			self.colorBar= plots.colorBar(self.model,parent=self, width=size, height=size)
-			self.matrixWindow.gridLayout.addWidget(self.colorBar,1,1,2,2)
+			self.matrixWindow.gridLayout.addWidget(plots.colorBar(2*size,6*size), 1,1,2,3)
+
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])

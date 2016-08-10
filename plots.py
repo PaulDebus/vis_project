@@ -6,12 +6,39 @@ import viewbox as vb
 import colorBar as cobar
 scheme = 'summer'
 
-def colorBar(model, parent=None, width=4, height=4):
-	#creates colorBar
-
-	pw = QtGui.QWidget()
-
-	return pw
+def colorBar(width, height):
+	center = QtGui.QWidget()
+	center.lay = QtGui.QVBoxLayout(center)
+	title = QtGui.QLabel("Coefficient of \n Correlation")
+	center.lay.addWidget(title)
+	hor = QtGui.QWidget()
+	center.lay.addWidget(hor)
+	horlay = QtGui.QHBoxLayout()
+	hor.setLayout(horlay)
+	center.lay.addWidget(hor)
+	l = QtGui.QLabel()
+	l.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
+	l.pixmap	= QtGui.QPixmap (QtCore.QSize(width,height))		
+	l.painter	= QtGui.QPainter (l.pixmap)		
+	gradient 	= QtGui.QLinearGradient(QtCore.QPointF(l.pixmap.rect().bottomLeft()),
+				QtCore.QPointF(l.pixmap.rect().topLeft()))		
+				
+	gradient.setColorAt(0,	QtGui.QColor(*correlationColor(1)))
+	gradient.setColorAt(1,	QtGui.QColor(*correlationColor(0.5)))
+	gradient.setColorAt(2,	QtGui.QColor(*correlationColor(0))		)
+			
+	brush 	= QtGui.QBrush(gradient)				
+	l.painter.fillRect( QtCore.QRectF(0, 0, width, height),brush)
+	l.setPixmap(l.pixmap)
+	horlay.addWidget(l)
+	lab = QtGui.QWidget()
+	labels = QtGui.QVBoxLayout()
+	lab.setLayout(labels)
+	horlay.addWidget(lab)
+	labels.addWidget(QtGui.QLabel('1'))
+	labels.addStretch()
+	labels.addWidget(QtGui.QLabel('0'))
+	return center
 
 
 def histogram(model, variables, parent=None, width=4, height=4):
@@ -19,7 +46,7 @@ def histogram(model, variables, parent=None, width=4, height=4):
 	pg.setConfigOption('background', 0.98)
 	pg.setConfigOption('foreground', 'k')
 	pw = pg.PlotWidget()
-	d =  model.data[:, variables]
+	d =	model.data[:, variables]
 	y,x = np.histogram(d, bins=10)
 	color = correlationColor(0.5)
 	pw.plot(x, y, stepMode=True, fillLevel=0 ,pen='k', brush=color)
