@@ -1,11 +1,12 @@
 import numpy as np
 import pyqtgraph as pg
+from pyqtgraph.Qt import QtGui
 
 
-class ColorBar(pg.GraphicsObject):
+class ColorBar(QtGui.QWidget):
 
 	def __init__(self, cmap, width, height, ticks=None, tick_labels=None, label=None):
-		pg.GraphicsObject.__init__(self)
+		QtGui.QWidget.__init__(self)
 
 		# handle args
 		label = label or ''
