@@ -5,6 +5,8 @@ import pyqtgraph as pg
 import plots
 import subwindow
 import numpy as np
+import pyqtgraph.exporters
+import os.path
 
 
 Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
@@ -19,18 +21,22 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.splitter.splitterMoved.connect(self.resizeLeft)
 		loadUi('GUI/mat.ui', self.matrixWindow)
 		bar = self.menuBar()
-		
-		menu = bar.addMenu("New")
-		menu.addAction("Scatter Plot")
-		menu.addAction("Histogram 1")
-		menu.addAction("Histogram 2")
-		menu.addAction("Mean + Std")
-		menu.addAction("Statistics")
-		menu.addAction("Radar 1")
-		menu.addAction("Radar 2")
-		menu.triggered[QtGui.QAction].connect(self.windowaction)
+		#creates emnubar in main menu
+		subWindowMenu = bar.addMenu("New Subwindow")
+		exportMenu = bar.addMenu("Export")
+		subWindowMenu.addAction("Scatter Plot")
+		subWindowMenu.addAction("Histogram 1")
+		subWindowMenu.addAction("Histogram 2")
+		subWindowMenu.addAction("Mean + Std")
+		subWindowMenu.addAction("Statistics")
+		subWindowMenu.addAction("Radar 1")
+		subWindowMenu.addAction("Radar 2")
+		exportMenu.addAction("Export selected subwindow as JPG")
+		subWindowMenu.triggered[QtGui.QAction].connect(self.windowAction)
+		exportMenu.triggered[QtGui.QAction].connect(self.exportAction)
 
-	def windowaction(self,q):
+	def windowAction(self,q):
+		#usuability of menubar
 		index1, index2 = self.model.getSelectedVariables()
 		if q.text() == "Scatter Plot":
 			sub = subwindow.scattMDI(self.model, index1, index2)
@@ -49,19 +55,38 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.mdiArea.addSubWindow(sub)
 		sub.show()
 		self.mdiArea.tileSubWindows()
+		
+	def exportAction(self,q):
+		#usuability of menubar
+		if q.text() == "Export selected subwindow":
+			widget=self.mdiArea.activeSubWindow().widget()
+			title=self.mdiArea.activeSubWindow().windowTitle()
+			p=QtGui.QPixmap.grabWindow(widget.winId())
+			directory="Exported_Images"
+			if not os.path.exists(directory):
+				os.makedirs(directory)
+			title=title.replace('/','')
+			title=title.replace(':','')
+			title=title.replace('   ','_')
+			title=title.replace('  ','_')
+			title=title.replace(' ','_')
+			title='Exported_Images/' + title+ '.jpg'
+			print(title)
+			p.save(title, 'jpg')
 
 
 
 	def addMatrix(self):
+	#creates "menu"-Matrix window 
 		while self.matrixWindow.gridLayout.count():
 				item = self.matrixWindow.gridLayout.takeAt(0)
 				widget = item.widget()
 				widget.deleteLater()
 		size = self.variableList.frameGeometry().width() / len(self.model.activeVariables)
 		num = len(model.activeVariables)
+		colorBar=plots.colorBar(2*size,6*size)
 		if num > 3:
-			self.matrixWindow.gridLayout.addWidget(plots.colorBar(2*size,6*size), 1,1,2,3)
-
+			self.matrixWindow.gridLayout.addWidget(colorBar, 1,1,2,3)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])
@@ -76,12 +101,11 @@ class Main(QMainWindow, Ui_MainWindow):
 		for name in model.activeVariables:
 			label = QtGui.QLabel(name)
 			self.matrixWindow.gridLayout.addWidget(label,num+1,model.activeVariables.index(name)+1)
-
-		
 		size = self.splitter.size().width()
 		self.resizeLeft()
 
 	def loadNames(self):
+	#creates checkitems for different parameters
 		qmodel = QtGui.QStandardItemModel(self.variableList)
 		qmodel.itemChanged.connect(self.listChange)
 		variables = self.model.inputNames + self.model.outputNames
@@ -94,6 +118,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.variableList.setModel(qmodel)
 
 	def listChange(self,e):
+	#listener for checklist
 		if e.checkState()==0:
 			self.model.setPassiveVar(e.text())
 		else:
@@ -102,11 +127,13 @@ class Main(QMainWindow, Ui_MainWindow):
 		self.addMatrix()
 
 	def resizeLeft(self):
+	#fits matrixWindow when splitter resizes
 		size = self.variableList.frameGeometry().width()
 		self.matrixWindow.resize(size, size)
 
 
 	def showDataBoxes(self, new=True):
+	#creates subwindows for selected variablepair
 		mdi = self.mdiArea
 		mdi.closeAllSubWindows()
 		index1, index2 = self.model.getSelectedVariables()
@@ -120,9 +147,9 @@ class Main(QMainWindow, Ui_MainWindow):
 		subs.append(subwindow.histMDI(self.model, index2, index1))
 		if abs(self.model.corrmat[index1, index2])>0.25:
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
-		subs.append(subwindow.TextMDI(self.model, index1, index2))
 		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
 			subs.append(subwindow.RadarMDI(self.model, index1, index2))
+		subs.append(subwindow.TextMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)
 			sub.show()

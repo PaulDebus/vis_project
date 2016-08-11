@@ -3,10 +3,10 @@ import matplotlib.pyplot
 import numpy as np
 import pyqtgraph as pg
 import viewbox as vb
-import colorBar as cobar
 scheme = 'summer'
 
 def colorBar(width, height):
+	#ColorLegend for CorrelationCoefficient in Matrix
 	center = QtGui.QWidget()
 	center.lay = QtGui.QVBoxLayout(center)
 	title = QtGui.QLabel("Coefficient of \n Correlation")
@@ -57,12 +57,12 @@ def histogram(model, variables, parent=None, width=4, height=4):
 	return pw
 
 class myScatter(pg.PlotWidget):
+	#scatterplot class for mouse functionality
 	def __init__(self, parent, model, variables):
 		super(myScatter, self).__init__()
 		self.parent = parent
 		self.model = model
 		self.variables = variables
-		#self.variables[0] = len(model.activeVariables)+1 - self.variables[0]
 	def mousePressEvent(self,e):
 		self.model.setSelectedVariables(self.variables[1], self.variables[0])
 		self.parent.showDataBoxes()

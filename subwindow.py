@@ -16,11 +16,11 @@ class myMDI(QtGui.QMdiSubWindow):
 		self.setup()
 
 class histMDI(myMDI):
+	#simple histogram
 	def setup(self):
 		pg.setConfigOption('foreground', 'k')
 		pw = pg.PlotWidget()
 		d = self.model.data[:, self.var1]
-
 		y,x = np.histogram(d, bins=25)
 		color = correlationColor(0.5)
 		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
@@ -52,12 +52,15 @@ class Radar(object):
 		self.ax.plot(angle, values, *args, **kw)
 
 class RadarMDI(myMDI):
+	#radar plot giving a convinient way of seeing correlations of one parameter to all others
 	def setup(self):
 		fig = plt.figure(figsize=(6, 6))
 		titles=self.model.inputNames+self.model.outputNames
 		labels = [["0.2","0.4","0.6","0.8","1"]]*len(self.model.inputNames+self.model.outputNames)
 		radar = Radar(fig, titles, labels)
-		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],  "-", lw=2, color="b", alpha=0.4, label=self.model.getVariableIndex(self.var1))
+		lColor=tuple([1/255*i for i in list(correlationColor(0))])
+		print(lColor)
+		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],  "-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
 		self.canvas = FigureCanvas(fig)
 		#wd=QtGui.QWidget()
 		self.setWidget(self.canvas)
@@ -65,6 +68,7 @@ class RadarMDI(myMDI):
 
 
 class MeanStdMDI(myMDI):
+	#stacked graph showing simple statistical parameters
 	def setup(self):
 		pw = pg.PlotWidget()
 		#num of steps
@@ -74,15 +78,15 @@ class MeanStdMDI(myMDI):
 		s = self.model.data[:, self.var2]
 		#generate 'histogram' with mean values, std and edges 
 		mean,edges,c=st.binned_statistic(t,s,statistic='mean',bins=bin)
-		#max,edges,c=st.binned_statistic(t,s,statistic=np.amax,bins=bin)
-		#min,edges,c=st.binned_statistic(t,s,statistic=np.amin,bins=bin)
+		max,edges,c=st.binned_statistic(t,s,statistic=np.amax,bins=bin)
+		min,edges,c=st.binned_statistic(t,s,statistic=np.amin,bins=bin)
 		std,edges,c=st.binned_statistic(t,s,statistic=np.std,bins=bin)
 		#creates upper and lower bound
-		min=[]
-		max=[]
+		stdMin=[]
+		stdMax=[]
 		for i in range(0,len(mean)):
-			min.append(mean[i]-std[i])
-			max.append(mean[i]+std[i])
+			stdMin.append(mean[i]-std[i])
+			stdMax.append(mean[i]+std[i])
 		#transfer edges to midpoints
 		midpoints=[]
 		old=edges[0]
@@ -90,20 +94,25 @@ class MeanStdMDI(myMDI):
 			midpoints.append((old+i)/2)
 			old=i
 		midpoints.pop(0)
-		#plot lines
-		minPlot=pg.PlotDataItem(midpoints, min, pen=pg.mkPen('w'))
-		meanPlot=pg.PlotDataItem(midpoints, mean, pen=pg.mkPen('k',width=2))
-		maxPlot=pg.PlotDataItem(midpoints, max, pen=pg.mkPen('w'))
 		#generate fill and fillcolor
-		colorMin=correlationColor(0.33)
-		colorMin=tuple([colorMin[0],colorMin[1],colorMin[2],150])
-		fill1=pg.FillBetweenItem(minPlot, meanPlot, brush=pg.mkBrush(colorMin))
-		colorMax=correlationColor(0.66)
-		colorMax=tuple([colorMax[0],colorMax[1],colorMax[2],150])
-		fill2=pg.FillBetweenItem(meanPlot, maxPlot, brush=pg.mkBrush(colorMax))
+		colorMinMax=correlationColor(0.66)
+		colorMinMax=tuple([colorMinMax[0],colorMinMax[1],colorMinMax[2],150])
+		colorStd=correlationColor(0.33)
+		colorStd=tuple([colorStd[0],colorStd[1],colorStd[2],150])
+		#plot lines
+		minPlot=pg.PlotDataItem(midpoints, min, pen=pg.mkPen(colorMinMax,width=2), name='MinValue')
+		stdMinPlot=pg.PlotDataItem(midpoints, stdMin, pen=pg.mkPen(colorStd,width=2), name='MinStd')
+		meanPlot=pg.PlotDataItem(midpoints, mean, pen=pg.mkPen('k',width=2), name='MeanValue')
+		stdMaxPlot=pg.PlotDataItem(midpoints, stdMax, pen=pg.mkPen(colorStd,width=2), name='maxStd')
+		maxPlot=pg.PlotDataItem(midpoints, max, pen=pg.mkPen(colorMinMax,width=2),name='MaxValue')
+		fill1=pg.FillBetweenItem(minPlot, maxPlot, brush=pg.mkBrush(colorMinMax))
+		fill2=pg.FillBetweenItem(stdMinPlot, stdMaxPlot, brush=pg.mkBrush(colorStd))
 		#add all to graph
+		pw.addLegend()
 		pw.addItem(minPlot)
+		pw.addItem(stdMinPlot)
 		pw.addItem(meanPlot)
+		pw.addItem(stdMaxPlot)
 		pw.addItem(maxPlot)
 		pw.addItem(fill1)
 		pw.addItem(fill2)
@@ -111,7 +120,7 @@ class MeanStdMDI(myMDI):
 		self.setWindowTitle("Mean- and StandardDeviationPlot: "+str(self.model.getIndexVariable(self.var1))+ " / " +str(self.model.getIndexVariable(self.var2)))
 
 class TextMDI(myMDI):
-
+	#simple textwidget givin relevant informations about given parameters
 	def setup(self):
 		pw = QtGui.QWidget()
 		t = self.model.data[:, self.var1]
@@ -153,10 +162,10 @@ class TextMDI(myMDI):
 			vbox.addWidget(i)
 		pw.setLayout(vbox)
 		self.setWidget(pw)
-		self.setWindowTitle("Statistical Data")
+		self.setWindowTitle("Statistical Data: " +self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2))
 
 class scattMDI(myMDI):
-
+	#scatterplot of both varibles including brushing and linking as well as overview map
 	def setup(self):
 		self.roi = pg.RectROI([0,0],[1,1],pen=pg.mkPen('r'))
 		pw = subScatter(self, self.model, [self.var1, self.var2], self.roi)
