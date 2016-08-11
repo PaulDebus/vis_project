@@ -18,6 +18,7 @@ def colorBar(width, height):
 	center.lay.addWidget(hor)
 	l = QtGui.QLabel()
 	l.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
+	'''
 	l.pixmap	= QtGui.QPixmap (QtCore.QSize(width,height))		
 	l.painter	= QtGui.QPainter (l.pixmap)		
 	gradient 	= QtGui.QLinearGradient(QtCore.QPointF(l.pixmap.rect().bottomLeft()),
@@ -29,6 +30,8 @@ def colorBar(width, height):
 			
 	brush 	= QtGui.QBrush(gradient)				
 	l.painter.fillRect( QtCore.QRectF(0, 0, width, height),brush)
+	'''
+	l.pixmap=QtGui.QPixmap(scheme+'.jpg')
 	l.setPixmap(l.pixmap)
 	horlay.addWidget(l)
 	lab = QtGui.QWidget()
