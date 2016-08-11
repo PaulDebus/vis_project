@@ -4,6 +4,7 @@ import numpy as np
 from scipy import stats as st
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from scipy import stats
 
 scheme='summer'
 
@@ -14,18 +15,84 @@ class myMDI(QtGui.QMdiSubWindow):
 		self.var1 = var1
 		self.var2 = var2
 		self.setup()
+		self.windowStateChanged.connect(self.changed)
+
+	def changed(self, old, new):
+		pass
 
 class histMDI(myMDI):
 	#simple histogram
 	def setup(self):
 		pg.setConfigOption('foreground', 'k')
-		pw = pg.PlotWidget()
+		self.center = QtGui.QWidget()
+		self.lay = QtGui.QVBoxLayout(self.center)
+		self.pw = pg.PlotWidget()
 		d = self.model.data[:, self.var1]
 		y,x = np.histogram(d, bins=25)
 		color = correlationColor(0.5)
-		pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
-		self.setWidget(pw)
+		self.pw.plot(x,y, stepMode=True, fillLevel=0, pen='k', brush=color)
+		self.lay.addWidget(self.pw)
+
+		self.txt = QtGui.QLabel()
+		self.fitDist(max(y))
+		self.txt.hide()
+		self.lay.addWidget(self.txt)
+
+		self.setWidget(self.center)
 		self.setWindowTitle("Histogramm: "+str(self.model.getIndexVariable(self.var1)))
+
+	def changed(self,old, new):
+		if (int(new) == 10 and int(old) == 8):
+			self.txt.show()
+			self.dist.show()
+			self.lay.addWidget(self.txt)
+		if (int(new) == 8 and int(old) == 10):
+			self.txt.hide()
+			self.dist.hide()
+			self.lay.removeWidget(self.txt)
+	
+	def fitDist(self, height):
+		rvs = self.model.data[:, self.var1]
+		sm = rvs.mean()
+		sstd = np.sqrt(rvs.var())
+		ssupp = (rvs.min(), rvs.max())
+		pval = 0
+		stat = None
+		name = None
+		params = None
+		distrib = None
+		for distr in [stats.norm, stats.chi2, stats.lognorm, stats.expon, stats.frechet_r, stats.frechet_l, stats.lognorm, stats.uniform, stats.wald]:
+			distname = distr.name
+			# estimate parameters
+			par_est = distr.fit(rvs,loc=sm, scale=sstd)
+			arg_est = par_est[:-2]	# get scale parameters if any
+			loc_est = par_est[-2]
+			scale_est = par_est[-1]
+			rvs_normed = (rvs-loc_est)/scale_est
+			ks_stat, ks_pval = stats.kstest(rvs_normed,distname, arg_est)
+			if ks_pval > pval:
+				pval = ks_pval
+				stat = ks_stat
+				name = distname
+				params = par_est
+				distrib = distr
+
+		table = """<table>
+			<th> Best fitting distribution: {name} </th>
+			<tr> <td> P Value: </td> <td> {pval} </td></tr>
+			<tr> <td> Mean: </td> <td> {mean} </td></tr>
+			<tr> <td> Standard Deviation: </td> <td> {std} </td></tr>
+			<tr> <td> Shape Parameters: </td> <td> {params} </td></tr>
+		</table>"""
+		self.txt.setText(table.format(name=name, pval = pval, mean = params[-2], std = params[-1], params = params))
+
+		xvals = np.linspace(ssupp[0],ssupp[1],100)
+		yvals = distrib.pdf(xvals, loc=params[-2], scale=params[-1], *params[:-2])
+		maxy = yvals.max()
+		yvals = yvals/maxy*height
+		self.dist = pg.PlotCurveItem(xvals, yvals, pen =pg.mkPen('r', width=2) )
+		self.pw.getPlotItem().addItem(self.dist)
+		self.dist.hide()
 
 class Radar(object):
 	def __init__(self, fig, titles, labels, rect=None):
@@ -59,7 +126,6 @@ class RadarMDI(myMDI):
 		labels = [["0.2","0.4","0.6","0.8","1"]]*len(self.model.inputNames+self.model.outputNames)
 		radar = Radar(fig, titles, labels)
 		lColor=tuple([1/255*i for i in list(correlationColor(0))])
-		print(lColor)
 		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],  "-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
 		self.canvas = FigureCanvas(fig)
 		#wd=QtGui.QWidget()
@@ -166,6 +232,12 @@ class TextMDI(myMDI):
 
 class scattMDI(myMDI):
 	#scatterplot of both varibles including brushing and linking as well as overview map
+	def changed(self,old, new):
+		if (int(new) == 10 and int(old) == 8):
+			self.overlay.show()
+		if (int(new) == 8 and int(old) == 10):
+			self.overlay.hide()
+
 	def setup(self):
 		self.roi = pg.RectROI([0,0],[1,1],pen=pg.mkPen('r'))
 		pw = subScatter(self, self.model, [self.var1, self.var2], self.roi)
@@ -176,16 +248,10 @@ class scattMDI(myMDI):
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		self.model.subscribeSelection(self)
-		def changed(old, new):
-			if (int(new) == 10 and int(old) == 8):
-				self.overlay.show()
-			if (int(new) == 8 and int(old) == 10):
-				self.overlay.hide()
 
 
 
 
-		self.windowStateChanged.connect(changed)
 
 		pw.addItem(self.roi)
 		pw.sigRangeChanged.connect(self.rangeChanged)
