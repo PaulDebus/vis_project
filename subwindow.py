@@ -188,6 +188,7 @@ class MeanStdMDI(myMDI):
 class TextMDI(myMDI):
 	#simple textwidget givin relevant informations about given parameters
 	def setup(self):
+		self.model.subscribeSelection(self)
 		pw = QtGui.QWidget()
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
@@ -227,9 +228,34 @@ class TextMDI(myMDI):
 		vbox.addWidget(title)
 		vbox.addWidget(table1)
 		vbox.addItem(hbox)
+		tWidget=QtGui.QWidget()
+		self.pointTable=QtGui.QTableWidget(parent=tWidget)
+		self.pointTable.hide()
+		self.refresh()
+		vbox.addWidget(self.pointTable)
 		pw.setLayout(vbox)
 		self.setWidget(pw)
 		self.setWindowTitle("Statistical Data: " +self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2))
+	
+	def refresh(self):
+	#adds table with data of selected points
+		selection = self.model.selection
+		if len(selection)==0:
+			self.pointTable.hide()
+		else:
+			headers = self.model.inputNames+self.model.outputNames
+			col=len(headers)
+			row=len(selection)
+			self.pointTable.setColumnCount(col)
+			self.pointTable.setRowCount(row)
+			self.pointTable.setHorizontalHeaderLabels(headers)
+			for n in range(0,col):
+				for m in range(0,row):
+					newitem = QtGui.QTableWidgetItem(str(self.model.data[selection[m],n]))
+					print(newitem)
+					self.pointTable.setItem(m, n, newitem)
+			self.pointTable.show()
+
 
 class scattMDI(myMDI):
 	#scatterplot of both varibles including brushing and linking as well as overview map
@@ -244,20 +270,11 @@ class scattMDI(myMDI):
 		pw = subScatter(self, self.model, [self.var1, self.var2], self.roi)
 		self.center = QtGui.QWidget()
 		self.center.verticalLayout = QtGui.QVBoxLayout(self.center)
-
-
 		t = self.model.data[:, self.var1]
 		s = self.model.data[:, self.var2]
 		self.model.subscribeSelection(self)
-
-
-
-
-
 		pw.addItem(self.roi)
 		pw.sigRangeChanged.connect(self.rangeChanged)
-
-
 		self.roi.setZValue(10)
 		pw.x = t
 		pw.y = s
