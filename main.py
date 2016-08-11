@@ -67,8 +67,8 @@ class Main(QMainWindow, Ui_MainWindow):
 				os.makedirs(directory)
 			title=title.replace('/','')
 			title=title.replace(':','')
-			title=title.replace('   ','_')
-			title=title.replace('  ','_')
+			title=title.replace('	 ','_')
+			title=title.replace('	','_')
 			title=title.replace(' ','_')
 			title='Exported_Images/' + title+ '.jpg'
 			print(title)
@@ -149,6 +149,10 @@ class Main(QMainWindow, Ui_MainWindow):
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
 			subs.append(subwindow.RadarMDI(self.model, index1, index2))
+		if index1 >= len(self.model.inputNames):
+			subs.append(subwindow.varMDI(self.model, index1, index2))
+		if index2 >= len(self.model.inputNames):
+			subs.append(subwindow.varMDI(self.model, index2, index2))
 		subs.append(subwindow.TextMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)

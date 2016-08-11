@@ -126,7 +126,7 @@ class RadarMDI(myMDI):
 		labels = [["0.2","0.4","0.6","0.8","1"]]*len(self.model.inputNames+self.model.outputNames)
 		radar = Radar(fig, titles, labels)
 		lColor=tuple([1/255*i for i in list(correlationColor(0))])
-		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],  "-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
+		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],	"-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
 		self.canvas = FigureCanvas(fig)
 		#wd=QtGui.QWidget()
 		self.setWidget(self.canvas)
@@ -385,3 +385,35 @@ class subScatter(pg.PlotWidget):
 			self.roi.sigRegionChangeFinished.connect(self.select)
 		else:
 			super(subScatter, self).mouseReleaseEvent(e)
+
+class varMDI(myMDI):
+	def setup(self):
+		w = pg.PlotWidget()
+		vars = [abs(i) for i in self.model.cop[:,self.var1-len(self.model.inputNames)]]
+		label = self.model.inputNames
+		labels = []
+		data = []
+		for i in range(len(label)):
+			if vars[i] > 0.05:
+				data.append(vars[i])
+				labels.append(label[i])
+
+		color = [tuple([j/255 for j in list(correlationColor(i))]) for i in data]
+
+		fig = plt.figure(figsize=(6,6))
+		plt.pie(data, labels=labels, colors=color, autopct='%1.1f%%', shadow=False, startangle=90)
+		plt.axis('equal')
+		self.canvas = FigureCanvas(fig)
+		self.setWidget(self.canvas)
+
+
+#		set_angle = 0
+#		for i in range(len(vars)):
+#			label = self.model.inputNames[i]
+#			angle= vars[i]
+#			ellipse = QtGui.QGraphicsEllipseItem(0,0,400,400)
+#			ellipse.setPos(200,200)
+#			ellipse.setStartAngle(set_angle)
+#			ellipse.setSpanAngle(angle)
+#			set_angle += angle
+#			w.getPlotItem().addItem(ellipse)

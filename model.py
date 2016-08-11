@@ -1,5 +1,5 @@
 import numpy
-
+from scipy.optimize import curve_fit
 from stats import Stats
 
 
@@ -16,6 +16,7 @@ class Model(object):
 		self.selectedVariables = [self.getVariableIndex(i) for i in self.activeVariables[:2]]
 		self.selection = []
 		self.subscribers = []
+		self.cop = self.calculateVariances()
 
 	def setActiveVar(self,name):
 		#activates variables to be shown in the matrix
@@ -63,6 +64,25 @@ class Model(object):
 	def subscribeSelection(self, subscriber):
 		#ad to list of all selection subscribers
 		self.subscribers.append(subscriber)
+
+	def calculateVariances(self):
+		inputs = self.data[:, :len(self.inputNames)]
+		outputs = self.data[:, -len(self.outputNames):]
+		def f(x, *params):
+			toret = numpy.sum(numpy.multiply(x, numpy.array(params)[:, numpy.newaxis]), axis=0)
+			return toret
+
+		self.meta = []
+		for i in range(len(self.outputNames)):
+			result = curve_fit(f, numpy.transpose(inputs), outputs[:,0], p0=[0]*(len(self.inputNames)))
+			self.meta.append(result[0])
+		vars = [i.var for i in self.stats][:len(self.inputNames)]
+		cop = numpy.zeros([len(self.inputNames), len(self.outputNames)])
+		for i in range(len(self.outputNames)):
+			nenner = sum(numpy.multiply(self.meta[i], vars))
+			for j in range(len(self.inputNames)):
+				cop[j,i] = vars[j]*self.meta[i][j]/nenner
+		return cop
 
 def fromFile(filename):
 	with open(filename) as f:
