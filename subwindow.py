@@ -218,14 +218,15 @@ class TextMDI(myMDI):
 			"<tr><td>Variance: <\td><td>{0:.5f}".format(self.model.stats[self.var2].var)+"</td></tr>"+
 			"</table>")
 		#print labels
-		labels=[]
-		labels.append(QtGui.QLabel("<h2>Statistical Data from: </h2>"))
-		labels.append(QtGui.QLabel(table1))
-		labels.append(QtGui.QLabel(table2))
-		labels.append(QtGui.QLabel(table3))
+		title=QtGui.QLabel("<h2>Statistical Data from: </h2>")
+		table1=QtGui.QLabel(table1)
+		hbox=QtGui.QHBoxLayout()
+		hbox.addWidget(QtGui.QLabel(table2))
+		hbox.addWidget(QtGui.QLabel(table3))
 		vbox = QtGui.QVBoxLayout()
-		for i in labels:
-			vbox.addWidget(i)
+		vbox.addWidget(title)
+		vbox.addWidget(table1)
+		vbox.addItem(hbox)
 		pw.setLayout(vbox)
 		self.setWidget(pw)
 		self.setWindowTitle("Statistical Data: " +self.model.getIndexVariable(self.var1) + " / " + self.model.getIndexVariable(self.var2))
