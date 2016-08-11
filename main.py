@@ -58,17 +58,18 @@ class Main(QMainWindow, Ui_MainWindow):
 		
 	def exportAction(self,q):
 		#usuability of menubar
-		if q.text() == "Export selected subwindow":
+		if q.text() == "Export selected subwindow as JPG":
 			widget=self.mdiArea.activeSubWindow().widget()
 			title=self.mdiArea.activeSubWindow().windowTitle()
 			p=QtGui.QPixmap.grabWindow(widget.winId())
+			path = os.path.abspath(__file__)
 			directory="Exported_Images"
 			if not os.path.exists(directory):
 				os.makedirs(directory)
 			title=title.replace('/','')
 			title=title.replace(':','')
-			title=title.replace('	 ','_')
-			title=title.replace('	','_')
+			title=title.replace('   ','_')
+			title=title.replace('  ','_')
 			title=title.replace(' ','_')
 			title='Exported_Images/' + title+ '.jpg'
 			print(title)

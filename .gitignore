@@ -2,3 +2,4 @@ __pycache__/
 .ropeproject/
 output.txt
 *.pyc
+Exported_Images/

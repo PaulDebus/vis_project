@@ -252,7 +252,6 @@ class TextMDI(myMDI):
 			for n in range(0,col):
 				for m in range(0,row):
 					newitem = QtGui.QTableWidgetItem(str(self.model.data[selection[m],n]))
-					print(newitem)
 					self.pointTable.setItem(m, n, newitem)
 			self.pointTable.show()
 
@@ -422,15 +421,6 @@ class varMDI(myMDI):
 		plt.axis('equal')
 		self.canvas = FigureCanvas(fig)
 		self.setWidget(self.canvas)
+		self.setWindowTitle("Variance Analysis for "+str(self.model.getIndexVariable(self.var1)))
 
 
-#		set_angle = 0
-#		for i in range(len(vars)):
-#			label = self.model.inputNames[i]
-#			angle= vars[i]
-#			ellipse = QtGui.QGraphicsEllipseItem(0,0,400,400)
-#			ellipse.setPos(200,200)
-#			ellipse.setStartAngle(set_angle)
-#			ellipse.setSpanAngle(angle)
-#			set_angle += angle
-#			w.getPlotItem().addItem(ellipse)
