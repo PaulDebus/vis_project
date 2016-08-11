@@ -413,14 +413,17 @@ class varMDI(myMDI):
 			if vars[i] > 0.05:
 				data.append(vars[i])
 				labels.append(label[i])
-
-		color = [tuple([j/255 for j in list(correlationColor(i))]) for i in data]
+		if sum(data)<0.99:
+			data.append(1-sum(data))
+			labels.append('Rest')
+		colorValues=[(i+1)/len(data) for i in range(len(data))]
+		color = [tuple([j/255 for j in list(correlationColor(i))]) for i in colorValues]
 
 		fig = plt.figure(figsize=(6,6))
 		plt.pie(data, labels=labels, colors=color, autopct='%1.1f%%', shadow=False, startangle=90)
 		plt.axis('equal')
 		self.canvas = FigureCanvas(fig)
 		self.setWidget(self.canvas)
-		self.setWindowTitle("Variance Analysis for "+str(self.model.getIndexVariable(self.var1)))
+		self.setWindowTitle("Variance Analysis: "+str(self.model.getIndexVariable(self.var1)))
 
 

@@ -74,7 +74,7 @@ class Model(object):
 
 		self.meta = []
 		for i in range(len(self.outputNames)):
-			result = curve_fit(f, numpy.transpose(inputs), outputs[:,0], p0=[0]*(len(self.inputNames)))
+			result = curve_fit(f, numpy.transpose(inputs), outputs[:,i], p0=[0]*(len(self.inputNames)))
 			self.meta.append(result[0])
 		vars = [i.var for i in self.stats][:len(self.inputNames)]
 		cop = numpy.zeros([len(self.inputNames), len(self.outputNames)])
