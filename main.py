@@ -34,6 +34,8 @@ class Main(QMainWindow, Ui_MainWindow):
 		subWindowMenu.addAction("Statistics")
 		subWindowMenu.addAction("Radar 1")
 		subWindowMenu.addAction("Radar 2")
+		subWindowMenu.addAction("Var Pie 1")
+		subWindowMenu.addAction("Var Pie 2")
 		exportMenu.addAction("Export selected subwindow as JPG")
 		subWindowMenu.triggered[QtGui.QAction].connect(self.windowAction)
 		exportMenu.triggered[QtGui.QAction].connect(self.exportAction)
@@ -55,6 +57,10 @@ class Main(QMainWindow, Ui_MainWindow):
 			sub = subwindow.RadarMDI(model, index1, index2)
 		if q.text() == "Radar 2":
 			sub = subwindow.RadarMDI(model, index2, index1)
+		if q.text() == "Var Pie 1":
+			sub = subwindow.varMDI(self.model, index1, index2)
+		if q.text() == "Var Pie 2":
+			sub = subwindow.varMDI(self.model, index2, index1)
 		self.mdiArea.addSubWindow(sub)
 		sub.show()
 		self.mdiArea.tileSubWindows()
@@ -134,7 +140,6 @@ class Main(QMainWindow, Ui_MainWindow):
 			self.model.setPassiveVar(e.text())
 		else:
 			self.model.setActiveVar(e.text())
-		print(e.text(),e.checkState(),self.model.getVariableIndex(e.text()))
 		self.addMatrix()
 
 	def resizeLeft(self):
@@ -160,10 +165,8 @@ class Main(QMainWindow, Ui_MainWindow):
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
 			subs.append(subwindow.RadarMDI(self.model, index1, index2))
-		if index1 >= len(self.model.inputNames):
+		if self.model.getIndexVariable(index1) in self.model.outputNames:
 			subs.append(subwindow.varMDI(self.model, index1, index2))
-		if index2 >= len(self.model.inputNames):
-			subs.append(subwindow.varMDI(self.model, index2, index2))
 		subs.append(subwindow.TextMDI(self.model, index1, index2))
 		for sub in subs:
 			mdi.addSubWindow(sub)
