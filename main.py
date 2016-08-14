@@ -81,7 +81,6 @@ class Main(QMainWindow, Ui_MainWindow):
 			title=title.replace('	','_')
 			title=title.replace(' ','_')
 			title='Exported_Images/' + title+ '.jpg'
-			print(title)
 			p.save(title, 'jpg')
 
 

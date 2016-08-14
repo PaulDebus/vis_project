@@ -10,16 +10,3 @@ class MyViewBox(pg.ViewBox):
             ev.ignore()
         else:
             pg.ViewBox.mouseDragEvent(self, ev)
-    '''
-
-        pos = ev.pos()
-        if ev.button() == QtCore.Qt.RightButton:
-            print('right')
-            if ev.isFinish():
-                self.rbScaleBox.hide()
-                #self.ax = QtCore.QRectF(Point(ev.buttonDownPos(ev.button())), Point(pos))
-                #self.ax = self.childGroup.mapRectFromParent(self.ax)
-                #self.Coords =  self.ax.getCoords()
-            else:
-                self.updateScaleBox(ev.buttonDownPos(), ev.pos())
-                '''
