@@ -1,5 +1,6 @@
 from pyqtgraph.Qt import QtGui, QtCore
 import matplotlib.pyplot
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
 import pyqtgraph as pg
 import viewbox as vb
@@ -24,12 +25,15 @@ def colorBar(width, height):
 	gradient 	= QtGui.QLinearGradient(QtCore.QPointF(l.pixmap.rect().bottomLeft()),
 				QtCore.QPointF(l.pixmap.rect().topLeft()))		
 				
-	gradient.setColorAt(0,	QtGui.QColor(*correlationColor(1)))
-	gradient.setColorAt(1,	QtGui.QColor(*correlationColor(0.5)))
-	gradient.setColorAt(2,	QtGui.QColor(*correlationColor(0))		)
-			
+#	gradient.setColorAt(0,	QtGui.QColor(*correlationColor(1)))
+#	gradient.setColorAt(1,	QtGui.QColor(*correlationColor(0.5)))
+#	gradient.setColorAt(2,	QtGui.QColor(*correlationColor(0))		)
+
+	for i in range(11):
+		gradient.setColorAt(i/10, QtGui.QColor(*correlationColor(i/10)))
 	brush 	= QtGui.QBrush(gradient)				
 	l.painter.fillRect( QtCore.QRectF(0, 0, width, height),brush)
+	l.pixmap.save(scheme+'.jpg', 'jpg')
 	'''
 	l.pixmap=QtGui.QPixmap(scheme+'.jpg')
 	l.setPixmap(l.pixmap)
@@ -42,6 +46,14 @@ def colorBar(width, height):
 	labels.addStretch()
 	labels.addWidget(QtGui.QLabel('0'))
 	return center
+
+def cobar():
+	fig = matplotlib.pyplot.figure(figsize=(6, 6))
+	bar = matplotlib.pyplot.colorbar(matplotlib.pyplot.get_cmap(scheme))
+	cbar.ax.set_yticklabels(['< -1', '0', '> 1'])
+	canvas = FigureCanvas()
+	return canvas
+
 
 
 def histogram(model, variables, parent=None, width=4, height=4):

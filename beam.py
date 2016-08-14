@@ -1,4 +1,4 @@
-def beam(L, B, H, X, P, E):
+def run(L, B, H, X, P, E):
     alpha = X/L
     beta = (L-X)/L
     moment_inertia = (B*H**3)/12

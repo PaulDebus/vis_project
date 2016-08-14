@@ -1,4 +1,7 @@
+'''Usage: main.py <file>
+'''
 from PyQt4.uic import loadUiType
+from docopt import docopt
 from PyQt4.uic import loadUi
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
@@ -68,8 +71,8 @@ class Main(QMainWindow, Ui_MainWindow):
 				os.makedirs(directory)
 			title=title.replace('/','')
 			title=title.replace(':','')
-			title=title.replace('   ','_')
-			title=title.replace('  ','_')
+			title=title.replace('	 ','_')
+			title=title.replace('	','_')
 			title=title.replace(' ','_')
 			title='Exported_Images/' + title+ '.jpg'
 			print(title)
@@ -110,7 +113,14 @@ class Main(QMainWindow, Ui_MainWindow):
 		qmodel = QtGui.QStandardItemModel(self.variableList)
 		qmodel.itemChanged.connect(self.listChange)
 		variables = self.model.inputNames + self.model.outputNames
-		for var in variables:
+		for var in self.model.inputNames:
+			item = QtGui.QStandardItem(var)
+			item.setCheckable(True)
+			if var in self.model.activeVariables:
+				item.setCheckState(2)
+				item.setBackground(QtGui.QColor('lightGray'))
+			qmodel.appendRow(item)
+		for var in self.model.outputNames:
 			item = QtGui.QStandardItem(var)
 			item.setCheckable(True)
 			if var in self.model.activeVariables:
@@ -166,7 +176,13 @@ if __name__ == '__main__':
 	from PyQt4 import QtGui
 	import model
 
-	model = model.fromFile('output.txt')
+	opts = docopt(__doc__)
+
+	if not os.path.exists(opts['<file>']):
+			import writeValues
+			name = opts['<file>'].split('.')[0]
+			writeValues.write(opts['<file>'])
+	model = model.fromFile(opts['<file>'])
 	app = QtGui.QApplication(sys.argv)
 	main = Main(model)
 	main.addMatrix()
