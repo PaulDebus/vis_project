@@ -119,6 +119,13 @@ class Main(QMainWindow, Ui_MainWindow):
 		qmodel = QtGui.QStandardItemModel(self.variableList)
 		qmodel.itemChanged.connect(self.listChange)
 		variables = self.model.inputNames + self.model.outputNames
+		it = QtGui.QStandardItem("Input Variables")
+		it.setCheckable(False)
+		it.setBackground(QtGui.QColor('lightGray'))
+		f = it.font()
+		f.setBold(True)
+		it.setFont(f)
+		qmodel.appendRow(it)
 		for var in self.model.inputNames:
 			item = QtGui.QStandardItem(var)
 			item.setCheckable(True)
@@ -126,6 +133,12 @@ class Main(QMainWindow, Ui_MainWindow):
 				item.setCheckState(2)
 				item.setBackground(QtGui.QColor('lightGray'))
 			qmodel.appendRow(item)
+		it = QtGui.QStandardItem("Output Variables")
+		it.setCheckable(False)
+		f = it.font()
+		f.setBold(True)
+		it.setFont(f)
+		qmodel.appendRow(it)
 		for var in self.model.outputNames:
 			item = QtGui.QStandardItem(var)
 			item.setCheckable(True)
