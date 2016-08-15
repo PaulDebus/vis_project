@@ -10,6 +10,7 @@ import subwindow
 import numpy as np
 import pyqtgraph.exporters
 import os.path
+import math
 
 
 Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
@@ -95,7 +96,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		num = len(model.activeVariables)
 		colorBar=plots.colorBar(2*size,6*size)
 		if num > 3:
-			self.matrixWindow.gridLayout.addWidget(colorBar, 1,1,2,3)
+			self.matrixWindow.gridLayout.addWidget(colorBar, 1,1,math.ceil(num/2)-1,math.ceil(num/2)-1)
 		for row in range(1, num+1):
 			for col in range(row, num+1):
 				var1 = model.getVariableIndex(model.activeVariables[row-1])
