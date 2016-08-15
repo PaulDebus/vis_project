@@ -33,8 +33,8 @@ class Main(QMainWindow, Ui_MainWindow):
 		subWindowMenu.addAction("Histogram 2")
 		subWindowMenu.addAction("Mean + Std")
 		subWindowMenu.addAction("Statistics")
-		subWindowMenu.addAction("Radar 1")
-		subWindowMenu.addAction("Radar 2")
+		subWindowMenu.addAction("Star 1")
+		subWindowMenu.addAction("Star 2")
 		subWindowMenu.addAction("Var Pie 1")
 		subWindowMenu.addAction("Var Pie 2")
 		exportMenu.addAction("Export selected subwindow as JPG")
@@ -54,10 +54,10 @@ class Main(QMainWindow, Ui_MainWindow):
 			sub = subwindow.MeanStdMDI(model, index1, index2)
 		if q.text() == "Statistics":
 			sub = subwindow.TextMDI(model, index1, index2)
-		if q.text() == "Radar 1":
-			sub = subwindow.RadarMDI(model, index1, index2)
-		if q.text() == "Radar 2":
-			sub = subwindow.RadarMDI(model, index2, index1)
+		if q.text() == "Star 1":
+			sub = subwindow.StarMDI(model, index1, index2)
+		if q.text() == "Star 2":
+			sub = subwindow.StarMDI(model, index2, index1)
 		if q.text() == "Var Pie 1":
 			sub = subwindow.varMDI(self.model, index1, index2)
 		if q.text() == "Var Pie 2":
@@ -177,7 +177,7 @@ class Main(QMainWindow, Ui_MainWindow):
 		if abs(self.model.corrmat[index1, index2])>0.25:
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
 		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
-			subs.append(subwindow.RadarMDI(self.model, index1, index2))
+			subs.append(subwindow.StarMDI(self.model, index1, index2))
 		if self.model.getIndexVariable(index1) in self.model.outputNames:
 			subs.append(subwindow.varMDI(self.model, index1, index2))
 		subs.append(subwindow.TextMDI(self.model, index1, index2))

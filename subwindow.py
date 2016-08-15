@@ -94,7 +94,7 @@ class histMDI(myMDI):
 		self.pw.getPlotItem().addItem(self.dist)
 		self.dist.hide()
 
-class Radar(object):
+class Star(object):
 	def __init__(self, fig, titles, labels, rect=None):
 		if rect is None:
 			rect = [0.1, 0.1, 0.8, 0.8]
@@ -118,19 +118,19 @@ class Radar(object):
 		values = np.r_[values, values[0]]
 		self.ax.plot(angle, values, *args, **kw)
 
-class RadarMDI(myMDI):
-	#radar plot giving a convinient way of seeing correlations of one parameter to all others
+class StarMDI(myMDI):
+	#star plot giving a convinient way of seeing correlations of one parameter to all others
 	def setup(self):
 		fig = plt.figure(figsize=(6, 6))
 		titles=self.model.inputNames+self.model.outputNames
 		labels = [["0.2","0.4","0.6","0.8","1"]]*len(self.model.inputNames+self.model.outputNames)
-		radar = Radar(fig, titles, labels)
+		star = Star(fig, titles, labels)
 		lColor=tuple([1/255*i for i in list(correlationColor(0))])
-		radar.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],	"-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
+		star.plot([5*abs(x) for x in self.model.corrmat[self.var1,:]],	"-", lw=2, color=lColor, alpha=0.4, label=self.model.getVariableIndex(self.var1))
 		self.canvas = FigureCanvas(fig)
 		#wd=QtGui.QWidget()
 		self.setWidget(self.canvas)
-		self.setWindowTitle("Correlation Radar Plot " +str(self.model.getIndexVariable(self.var1)))
+		self.setWindowTitle("Correlation Star Plot " +str(self.model.getIndexVariable(self.var1)))
 
 
 class MeanStdMDI(myMDI):
