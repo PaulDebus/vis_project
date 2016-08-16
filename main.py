@@ -1,4 +1,9 @@
-'''Usage: main.py <file>
+'''
+Visualization programm by:
+Paul Debus, Paul Brust
+Bauhaus Universität Weimar
+
+Usage: main.py <file>
 '''
 from PyQt4.uic import loadUiType
 from docopt import docopt
