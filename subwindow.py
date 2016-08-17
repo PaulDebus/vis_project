@@ -34,7 +34,8 @@ class histMDI(myMDI):
 		self.lay.addWidget(self.pw)
 
 		self.txt = QtGui.QLabel()
-		self.fitDist(max(y))
+		self.distheight = max(y)
+		self.fitted = False
 		self.txt.hide()
 		self.lay.addWidget(self.txt)
 
@@ -43,6 +44,9 @@ class histMDI(myMDI):
 
 	def changed(self,old, new):
 		if (int(new) == 10 and int(old) == 8):
+			if not self.fitted:
+				self.fitDist(self.distheight)
+				self.fitted = True
 			self.txt.show()
 			self.dist.show()
 			self.lay.addWidget(self.txt)
@@ -61,7 +65,7 @@ class histMDI(myMDI):
 		name = None
 		params = None
 		distrib = None
-		for distr in [stats.norm, stats.chi2, stats.lognorm, stats.expon, stats.frechet_r, stats.frechet_l, stats.lognorm, stats.uniform, stats.wald]:
+		for distr in [stats.norm, stats.chi2, stats.lognorm, stats.expon, stats.frechet_r, stats.frechet_l, stats.uniform]:
 			distname = distr.name
 			# estimate parameters
 			par_est = distr.fit(rvs,loc=sm, scale=sstd)

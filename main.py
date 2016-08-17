@@ -16,8 +16,11 @@ import numpy as np
 import pyqtgraph.exporters
 import os.path
 import math
+import logging
 
+import time
 
+logging.basicConfig(level=40)
 Ui_MainWindow, QMainWindow = loadUiType('GUI/MainWindow.ui')
 
 
@@ -168,28 +171,53 @@ class Main(QMainWindow, Ui_MainWindow):
 
 	def showDataBoxes(self, new=True):
 	#creates subwindows for selected variablepair
+		logger = logging.getLogger("showDataBoxes")
 		mdi = self.mdiArea
+		step = time.time()
 		mdi.closeAllSubWindows()
+		logger.info("Time to closing: {}".format(time.time()-step))
+		step= time.time()
 		index1, index2 = self.model.getSelectedVariables()
 		var1 = self.model.getIndexVariable(index1)
 		var2 = self.model.getIndexVariable(index2)
 		self.label.setText("{0}, {1}".format(var1, var2))
 
 		subs = []
+		logger.info("Time to set Label: {}".format( time.time()-step))
+		step= time.time()
 		subs.append(subwindow.histMDI(self.model, index1, index2))
+		logger.info("Time for hist 1: {}".format( time.time()-step))
+		step= time.time()
 		subs.append(subwindow.scattMDI(self.model, index1, index2))
+		logger.info("Time for scatterplot: {}".format( time.time()-step))
+		step= time.time()
 		subs.append(subwindow.histMDI(self.model, index2, index1))
+		logger.info("Time for hist 2: {}".format( time.time()-step))
+		step= time.time()
 		if abs(self.model.corrmat[index1, index2])>0.25:
 			subs.append(subwindow.MeanStdMDI(self.model, index1, index2))
+		logger.info("Time for mean std: {}".format( time.time()-step))
+		step= time.time()
 		if len(np.where(abs(self.model.corrmat[:, index1])>0.2)[0])>2:
 			subs.append(subwindow.StarMDI(self.model, index1, index2))
+		logger.info("Time for starplot: {}".format( time.time()-step))
+		step= time.time()
 		if self.model.getIndexVariable(index1) in self.model.outputNames:
 			subs.append(subwindow.varMDI(self.model, index1, index2))
+		logger.info("Time to variances: {}".format( time.time()-step))
+		step= time.time()
 		subs.append(subwindow.TextMDI(self.model, index1, index2))
+		logger.info("Time for text: {}".format( time.time()-step))
+		step= time.time()
 		for sub in subs:
 			mdi.addSubWindow(sub)
 			sub.show()
+		logger.info("Time to show windows: {}".format( time.time()-step))
+		step= time.time()
 		mdi.tileSubWindows()
+		logger.info("Time to tile windows: {}".format( time.time()-step))
+		step= time.time()
+		logger.info("===================================")
 
 
 if __name__ == '__main__':
